@@ -1,0 +1,22 @@
+form a:hover  {
+	text-decoration: underline !important;
+	color: red !important;
+}
+
+.no-close .ui-dialog-titlebar-close {
+	display: none;
+}
+
+.ui-widget {
+	font-size: 12px;
+}
+
+.chattab-highlight {
+	color: yellow;
+	background: red;
+}
+
+.chattab-active {
+	color: blue;
+	background: green;
+}
