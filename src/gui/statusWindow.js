@@ -116,12 +116,12 @@ function createStatusWindow() {
 
 	$("#statusWindowCopyToChatButton").click(function () {
 		document.getElementById("chatInput").value += (
-			"str: " + s.strBase + (s.strBonus ? "+" + s.strBonus : "") +
-			" agi: " + s.strBase + (s.agiBonus ? "+" + s.agiBonus : "") +
-			" vit: " + s.vitBase + (s.vitBonus ? "+" + s.vitBonus : "") +
-			" int: " + s.intBase + (s.intBonus ? "+" + s.intBonus : "") +
-			" dex: " + s.dexBase + (s.dexBonus ? "+" + s.dexBonus : "") +
-			" luk: " + s.lukBase + (s.lukBonus ? "+" + s.lukBonus : "")
+			"str:" + s.strBase + (s.strBonus ? "+" + s.strBonus : "") +
+			" agi:" + s.agiBase + (s.agiBonus ? "+" + s.agiBonus : "") +
+			" vit:" + s.vitBase + (s.vitBonus ? "+" + s.vitBonus : "") +
+			" int:" + s.intBase + (s.intBonus ? "+" + s.intBonus : "") +
+			" dex:" + s.dexBase + (s.dexBonus ? "+" + s.dexBonus : "") +
+			" luk:" + s.lukBase + (s.lukBonus ? "+" + s.lukBonus : "")
 		);
 	});
 
