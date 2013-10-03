@@ -20,27 +20,35 @@
 "use strict";
 
 function createSettingsWindow() {
-	var win = $("<div>")
-		.attr("id", "settingsWindow")
-		.attr("title", "Settings")
-		.html("<form id='settingsForm'>" +
-			"<input type='checkbox' id='mapRaster'>" +
-			"<label for='mapRaster'>Map raster</label><br>" +
-			"<input type='checkbox' id='mapCollision'>" +
-			"<label for='mapCollision'>Collision tiles</label>" +
-			"</form>")
-		.appendTo("#game")
-		.dialog({autoOpen: false, closeOnEscape: false});
-
-	$("#mapRaster").change(function () {
-		tmw.config.debugRaster = document.getElementById("mapRaster").checked;});
-		
-	$("#mapCollision").change(function () {
-		tmw.config.debugCollision = document.getElementById("mapCollision").checked;});
-
 	tmw.gui.settings = {
 		toggle: function () {
 			win.dialog("isOpen") ? win.dialog("close") : win.dialog("open");
 		},
 	};
+
+	var win = $("<div>")
+		.attr("id", "settingsWindow")
+		.attr("title", "Settings")
+		.html("<form id='settingsForm'>" +
+			"<input type='checkbox' id='mapRasterCheckbox'>" +
+			"<label for='mapRasterCheckbox'>Map raster</label><br>" +
+			"<input type='checkbox' id='collisionCheckbox'>" +
+			"<label for='collisionCheckbox'>Collision tiles</label><br>" +
+			"<input type='checkbox' id='showFpsCheckbox'>" +
+			"<label for='showFpsCheckbox'>Show FPS</label>" +
+			"</form>")
+		.appendTo("#game")
+		.dialog({autoOpen: false, closeOnEscape: false});
+
+	$("#mapRasterCheckbox").change(function () {
+		tmw.config.debugRaster = document.getElementById("mapRasterCheckbox").checked;});
+
+	$("#collisionCheckbox").change(function () {
+		tmw.config.debugCollision = document.getElementById("collisionCheckbox").checked;});
+
+	$("#showFpsCheckbox").change(function () {
+		var value = document.getElementById("showFpsCheckbox").checked;
+		tmw.config.showFps = value;
+		value ? $("#fps").show() : $("#fps").hide();
+	});
 }

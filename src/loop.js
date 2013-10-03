@@ -62,12 +62,13 @@ function createLoop() {
 			}
 		}
 
-		// fps
-		countFps++;
-		if (timeAnimation >= checkFps) {
-			$("#fps").html("fps: " + countFps);
-			countFps = 0;
-			checkFps = timeAnimation + 1000;
+		if (tmw.config.showFps) {
+			countFps++;
+			if (timeAnimation >= checkFps) {
+				$("#fps").html("fps: " + countFps);
+				countFps = 0;
+				checkFps = timeAnimation + 1000;
+			}
 		}
 
 		var context = tmw.context;

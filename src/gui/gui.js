@@ -30,6 +30,7 @@ function createGui() {
 		.css("height", 20)
 		.css("background-color", "white")
 		.css("font-size", "10pt")
+		.hide()
 		.appendTo("#game");
 
 	// hp Bar
