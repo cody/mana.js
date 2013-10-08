@@ -139,8 +139,7 @@ function newOutgoingMessage(msgName) {
 				view.setUint8(pos, 0);
 			}
 		},
-		writeCoordinates: function (x, y, dir) {
-			console.assert(!dir);
+		writeCoordinates: function (x, y) {
 			view.setUint8(pos++, x >>> 2);
 			view.setUint8(pos++, ((x & 0x3) << 6) | (y >>> 4));
 			view.setUint8(pos++, (y & 0xf) << 4);

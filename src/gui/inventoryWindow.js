@@ -40,7 +40,7 @@ function createInventoryWindow() {
 		.css("top", 24)
 		.css("background", "grey")
 		.html("<div id='inventoryWindowHandle'></div>" +
-			"<span style='margin-left:4px; font-size:11pt;'>Inventory</span>" +
+			"<span style='margin-left:4px;;'>Inventory</span>" +
 			"<div id='weightBar'></div>" +
 			"<div id='slotBar'></div>" +
 			"<div id='inventoryWindowScroll'>" +

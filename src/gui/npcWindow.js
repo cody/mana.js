@@ -32,9 +32,8 @@ function createNPCWindow() {
 		.css("left", 80)
 		.css("top", 50)
 		.hide()
-		.css("font-size", "11pt")
 		.html("<div id='npcWindowTitle'>" +
-			"<span id='npcWindowName' style='margin-left:4px; font-size:11pt;'></span></div>" +
+			"<span id='npcWindowName' style='margin-left:4px;'></span></div>" +
 			"<div id='npcWindowScroll'></div>")
 		.appendTo("#game");
 	win.resizable({resize: $.noop, containment: "#game",

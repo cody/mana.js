@@ -39,9 +39,8 @@ function createSkillsWindow() {
 		.css("top", 26)
 		.hide()
 		.css("background", "Bisque")
-		.css("font-size", "11pt")
 		.html("<div id='skillsWindowTitle' style='background:SpringGreen'>" +
-			"<span id='skillsWindowName' style='margin:4px; font-size:11pt;'>" +
+			"<span id='skillsWindowName' style='margin:4px;'>" +
 			"Skills</span></div>" +
 			"<div>" +
 			"<button id='skillsBasicRadio'>Basic</button>" +

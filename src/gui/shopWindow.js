@@ -48,7 +48,7 @@ function createShopWindow() {
 		.hide()
 		.css("background", "Bisque")
 		.html("<div id='shopWindowTitle'>" +
-			"<span id='shopWindowName' style='margin:4px; font-size:11pt;'>" +
+			"<span id='shopWindowName' style='margin:4px;'>" +
 			"</span></div>" +
 			"<div>" +
 			"<button id='shopBuyRadio'>Buy</button>" +

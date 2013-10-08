@@ -30,9 +30,8 @@ function createStatusWindow() {
 		.css("top", 28)
 		.hide()
 		.css("background", "Bisque")
-		.css("font-size", "10pt")
 		.html("<div id='statusWindowTitle'>" +
-			"<span style='margin-left:4px; font-size:11pt;'>Status</span></div>" +
+			"<span style='margin-left:4px;'>Status</span></div>" +
 			"<div id='statusWindowLeft'></div>" +
 			"<div id='statusWindowRight'></div>")
 		.appendTo("#game");

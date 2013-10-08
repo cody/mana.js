@@ -26,10 +26,10 @@ function createGui() {
 		.css("position", "absolute")
 		.css("right", 1)
 		.css("bottom", 1)
-		.css("width", 50)
+		.css("width", 46)
 		.css("height", 20)
+		.css("padding", 2)
 		.css("background-color", "white")
-		.css("font-size", "10pt")
 		.hide()
 		.appendTo("#game");
 
@@ -81,11 +81,11 @@ function createGui() {
 			func: tmw.gui.settings.toggle,
 			png: "button-icon-setup.png",
 		},
-		{
+		/*{
 			id: "toggleWindowButtonShortcut",
 			func: $.noop,
 			png: "button-icon-shortcut.png",
-		},
+		},*/
 		{
 			id: "toggleWindowButtonSkills",
 			func: tmw.gui.skills.toggle,
@@ -101,11 +101,11 @@ function createGui() {
 			func: tmw.gui.chat.toggle,
 			png: "button-icon-skills.png",
 		},
-		{
+		/*{
 			id: "toggleWindowButtonEquipment",
 			func: $.noop,
 			png: "button-icon-equipment.png",
-		},
+		},*/
 		{
 			id: "toggleWindowButtonStatus",
 			func: tmw.gui.status.toggle,
