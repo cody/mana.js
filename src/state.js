@@ -19,45 +19,6 @@
 
 "use strict";
 
-/*
-	STATE_ERROR,
-		STATE_START,
-    STATE_CHOOSE_SERVER,
-    STATE_CONNECT_SERVER,
-		STATE_LOGIN,
-		STATE_LOGIN_ATTEMPT,
-		STATE_WORLD_SELECT,
-		STATE_WORLD_SELECT_ATTEMPT,
-		STATE_UPDATE,
-		STATE_LOAD_DATA,
-		STATE_GET_CHARACTERS,
-		STATE_CHAR_SELECT,
-		STATE_CONNECT_GAME,
-		STATE_GAME,
-    STATE_CHANGE_MAP,
-		STATE_LOGIN_ERROR,
-    STATE_ACCOUNTCHANGE_ERROR,
-    STATE_REGISTER_PREP,
-    STATE_REGISTER,
-    STATE_REGISTER_ATTEMPT,
-    STATE_CHANGEPASSWORD,
-    STATE_CHANGEPASSWORD_ATTEMPT,
-    STATE_CHANGEPASSWORD_SUCCESS,
-    STATE_CHANGEEMAIL,
-    STATE_CHANGEEMAIL_ATTEMPT,
-    STATE_CHANGEEMAIL_SUCCESS,
-    STATE_UNREGISTER,
-    STATE_UNREGISTER_ATTEMPT,
-    STATE_UNREGISTER_SUCCESS,
-    STATE_SWITCH_SERVER,
-    STATE_SWITCH_LOGIN,
-    STATE_SWITCH_CHARACTER,
-    STATE_LOGOUT_ATTEMPT,
-    STATE_WAIT,
-    STATE_EXIT,
-    STATE_FORCE_QUIT
-*/
-
 tmw.state = {
 	currentState: null,
 	set: function (s, args) {
@@ -102,7 +63,7 @@ tmw.state.STATE_LOGIN = function () {
 		.css("text-decoration", "none")
 		.css("color", "green")
 		.css("font-family", "monospace")
-		.css("font-size", 20);
+		.css("font-size", "12pt");
 	$("#connectButton").button();
 	$("#connectButton")
 		.css("color", "Brown")
@@ -162,7 +123,6 @@ tmw.state.STATE_WORLD_SELECT_ATTEMPT = function (index) {
 };
 
 tmw.state.STATE_GET_CHARACTERS = function () {
-	document.getElementById("wallpaper").innerHTML = "<h1>STATE_GET_CHARACTERS</h1>";	
 	var msg = newOutgoingMessage("CMSG_CHAR_SERVER_CONNECT");
     msg.write32(tmw.net.token.accountId);
     msg.write32(tmw.net.token.sessionId1);
@@ -170,34 +130,12 @@ tmw.state.STATE_GET_CHARACTERS = function () {
     msg.write16(1);
     msg.write8(tmw.net.token.sex);
 	msg.send();
+	createCharSelectWindow();
 	tmw.net.read(true);
 };
 
-tmw.state.STATE_CHAR_SELECT = function (charSelectChoices) {
-	document.getElementById("wallpaper").innerHTML =
-		"<h1>Account and Character Management</h1>" +
-		"<select id='char' size='9'> </select>" +
-		"<br><input type='button' id='choose' value='Choose' />";
-	document.getElementById("choose").onclick = function () {
-		var c = document.getElementById("char").selectedIndex;
-		if (c >= 0) {
-			tmw.localplayer = charSelectChoices[c];
-			var msg = newOutgoingMessage("CMSG_CHAR_SELECT");
-			msg.write8(charSelectChoices[c].slot);
-			msg.send();
-			document.getElementById("wallpaper").innerHTML = "<h1>Sending selected character</h1>";
-		}
-	};
-	var character = document.getElementById("char");
-	for (var i=0; i<charSelectChoices.length; i++) {
-		character.add(new Option([charSelectChoices[i].name]));
-		if (tmw.secret && tmw.secret.character === charSelectChoices[i].name) {
-			character.selectedIndex = i;
-			$("#choose").trigger("click");
-			return;
-		}
-	}
-	character.selectedIndex = 0;
+tmw.state.STATE_CHAR_SELECT = function () {
+	tmw.gui.charSelect.draw();
 };
 
 tmw.state.STATE_CONNECT_GAME = function () {
@@ -221,6 +159,7 @@ tmw.state.STATE_GAME = function () {
 		.css("left", 0)
 		.css("height", "100%")
 		.css("width", "100%")
+		.css("font-size", "11pt")
 		.appendTo("body");
 	$("<canvas>")
 		.attr("id", "canvas")

@@ -20,3 +20,37 @@ form a:hover  {
 	color: blue;
 	background: green;
 }
+
+input[type="range"]{
+	-webkit-appearance: none;
+	width: 130px;
+	height: 6px;
+	border-radius: 8px;
+	background: LightBlue;
+}
+
+input[type="range"]:hover{
+	-webkit-appearance: none;
+	width: 130px;
+	height: 6px;
+	border-radius: 8px;
+	background: RoyalBlue;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+	-webkit-appearance:none;
+	width: 20px;
+	height: 12px;
+	border-radius: 8px;
+	border: 1px solid black;
+	background: LightBlue;
+ }
+
+input[type="range"]::-webkit-slider-thumb:hover{
+	-webkit-appearance: none;
+	width: 20px;
+	height: 12px;
+	border-radius: 8px;
+	border: 1px solid black;
+	background: Blue;
+ }

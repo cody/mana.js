@@ -20,7 +20,6 @@
 "use strict";
 
 tmw.state.STATE_LOAD_DATA = function () {
-	loadXmlFromZip("charcreation.xml", readCharcreationXml);
 	loadXmlFromZip("effects.xml", readEffectsXml);
 	loadXmlFromZip("emotes.xml", readEmotesXml);
 	loadXmlFromZip("hair.xml", readHairXml);
@@ -32,7 +31,7 @@ tmw.state.STATE_LOAD_DATA = function () {
 	loadXmlFromZip("skills.xml", readSkillsXml);
 	loadXmlFromZip("status-effects.xml", readStatusEffectsXml);
 	tmw.loadDataCounter = (function () {
-		var numberOfFiles = 11;
+		var numberOfFiles = 10;
 		return {
 			readXmlFinished: function () {
 				if (--numberOfFiles === 0) {
@@ -43,11 +42,6 @@ tmw.state.STATE_LOAD_DATA = function () {
 		};
 	})();
 };
-
-function readCharcreationXml() {
-	console.warn("Implement reading charcreation.xml");
-	tmw.loadDataCounter.readXmlFinished();
-}
 
 function readEffectsXml() {
 	console.warn("Implement reading effects.xml");
