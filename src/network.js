@@ -33,6 +33,7 @@ function createNetwork() {
 		getUpdateHost: function () { return updatehost; },
 		getWorlds: function () { return worlds; },
 		packetLimiter: packetLimiter,
+		fatalError: fatalError,
 	};
 
 	var socketId = null;

@@ -98,6 +98,10 @@ tmw.state.STATE_UPDATE = function () {
 	}
 	
 	function readResourcesXml(xml) {
+		if (!xml) {
+			tmw.net.fatalError("resources.xml is invalid");
+			return;
+		}
 		var updates = xml.getElementsByTagName("updates")[0].childNodes;
 		for (var i = 0; i < updates.length; i++) {
 			if (updates[i].nodeName !== "update") {
