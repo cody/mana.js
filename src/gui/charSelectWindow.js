@@ -85,37 +85,7 @@ function createCharSelectWindow() {
 			}
 			drawCreate();
 		};
-		var context = canvas.getContext("2d");
-		tmw.context = context;
-		context.beginPath();
-		context.strokeStyle = "#947356";
-		context.moveTo(96, 0); context.lineTo(96, 288);
-		context.moveTo(192, 0); context.lineTo(192, 288);
-		context.moveTo(0, 96); context.lineTo(288, 96);
-		context.moveTo(0, 192); context.lineTo(288, 192);
-		context.stroke();
-		context.font = "9pt sans-serif";
-		context.textAlign = "center";
-		context.textBaseline = "bottom";
-		for (var slot=0; slot<9; slot++) {
-			var index = null;
-			for (var i in choices){
-				if (choices[i].slot === slot) {
-					index = i;
-					break;
-				}
-			}
-			var left = (slot * 96) % 288 + 48;
-			var top = Math.floor(slot / 3) * 96;
-			if (index !== null) {
-				choices[index].x = left;
-				choices[index].y = top + 65;
-				var text = choices[index].nameInsecure;
-			} else {
-				text = "create";
-			}
-			context.fillText(text, left, top + 94);
-		}
+		tmw.context = canvas.getContext("2d");
 		animationId = window.requestAnimationFrame(runAnimationChoices);
 	}
 
@@ -236,6 +206,37 @@ function createCharSelectWindow() {
 
 	function runAnimationChoices(timeAnimation) {
 		animationId = window.requestAnimationFrame(runAnimationChoices);
+		var context = tmw.context;
+		context.clearRect(0, 0, win.width(), win.height());
+		context.beginPath();
+		context.strokeStyle = "#947356";
+		context.moveTo(96, 0); context.lineTo(96, 288);
+		context.moveTo(192, 0); context.lineTo(192, 288);
+		context.moveTo(0, 96); context.lineTo(288, 96);
+		context.moveTo(0, 192); context.lineTo(288, 192);
+		context.stroke();
+		context.font = "9pt sans-serif";
+		context.textAlign = "center";
+		context.textBaseline = "bottom";
+		for (var slot=0; slot<9; slot++) {
+			var index = null;
+			for (var i in choices){
+				if (choices[i].slot === slot) {
+					index = i;
+					break;
+				}
+			}
+			var left = (slot * 96) % 288 + 48;
+			var top = Math.floor(slot / 3) * 96;
+			if (index !== null) {
+				choices[index].x = left;
+				choices[index].y = top + 65;
+				var text = choices[index].nameInsecure;
+			} else {
+				text = "create";
+			}
+			context.fillText(text, left, top + 94);
+		}
 		for (var i in choices) {
 			drawSprites(choices[i], 0, 0, 0);
 		}
