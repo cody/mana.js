@@ -173,7 +173,7 @@ function createCharSelectWindow() {
 
 		var selectColor = document.getElementById("charCreationColor");
 		for (var i in tmw.hairColorDB) {
-			if (i >= 13) break;
+			if (i >= 12) break;
 			selectColor.add(new Option([tmw.hairColorDB[i].name]));
 		}
 		selectColor.selectedIndex = Math.random() * (selectColor.length - 1);
