@@ -87,8 +87,24 @@ tmw.handler.SMSG_CHAR_CREATE_SUCCEEDED = function (msg) {
 };
 
 tmw.handler.SMSG_CHAR_CREATE_FAILED = function (msg) {
-	$("#charCreationInfoText").text("Failed to create character. " +
+	tmw.gui.charSelect.charCreationFailed("Failed to create character. " +
 		"Most likely the name is already taken.");
+};
+
+tmw.handler.SMSG_CHAR_LOGIN_ERROR = function (msg) {
+	var text;
+	switch (msg.read8()) {
+		case 0:
+			text = "Access denied. Most likely, there are " +
+				"too many players on this server.";
+			break;
+		case 1:
+			text = "Cannot use this ID.";
+			break;
+		default:
+			text = "Unknown char-server failure.";
+	}
+	tmw.net.fatalError("SMSG_CHAR_LOGIN_ERROR: " + text);
 };
 
 tmw.handler.SMSG_CHAR_MAP_INFO = function (msg) {

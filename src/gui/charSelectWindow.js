@@ -23,6 +23,7 @@ function createCharSelectWindow() {
 	tmw.gui.charSelect = {
 		addChoice: addChoice,
 		draw: draw,
+		charCreationFailed: function (text) {$("#charCreationInfoText").text(text);},
 	};
 
 	var choices = {};
