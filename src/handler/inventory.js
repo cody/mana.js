@@ -19,16 +19,6 @@
 
 "use strict";
 
-/* Todo
-InventoryHandler
-        SMSG_PLAYER_STORAGE_ITEMS,
-        SMSG_PLAYER_STORAGE_EQUIP,
-        SMSG_PLAYER_STORAGE_STATUS,
-        SMSG_PLAYER_STORAGE_ADD,
-        SMSG_PLAYER_STORAGE_REMOVE,
-        SMSG_PLAYER_STORAGE_CLOSE,
-*/
-
 tmw.handler.SMSG_PLAYER_ATTACK_RANGE = function (msg) {
 	tmw.localplayer.attackRange = msg.read16() + 1;
 	tmw.gui.status.updateAttackRange();
@@ -219,4 +209,22 @@ function equipTypeToSlotName(equipType) {
 		default: console.error("Unknown equipType: 0x" + equipType.toString(16));
 	}
 	return null;
+}
+
+tmw.handler.SMSG_PLAYER_STORAGE_STATUS = function (msg) {
+	console.error("Storage not implemented");
+	var usedCount = msg.read16();
+	var maxSize = msg.read16();
+	$("<div>")
+		.html("Storage is not implemented yet!<br>You have in your Storage " +
+			usedCount + " Items out of a maximum of " + maxSize + " Items.")
+		.attr("title", "Storage")
+		.css("display", "none")
+		.dialog({ dialogClass: "no-close",
+			closeOnEscape: false,
+			buttons: { Quit: function() {
+				$(this).dialog("close");
+				newOutgoingMessage("CMSG_CLOSE_STORAGE").send();
+			}
+		}});
 }
