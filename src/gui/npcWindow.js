@@ -43,7 +43,6 @@ function createNPCWindow() {
 		.css("background", "ForestGreen");
 	var scroll = $("#npcWindowScroll")
 		.css("position", "absolute")
-		.css("top", 20)
 		.css("bottom", 0)
 		.css("width", "100%")
 		.css("background", "Bisque")
@@ -64,6 +63,7 @@ function createNPCWindow() {
 				isOpen = true;
 				var name = tmw.beings[id] ? tmw.beings[id].name : null;
 				$("#npcWindowName").text(name ? name : "NPC");
+				scroll.css("top", $("#npcWindowTitle").height());
 			}
 			$("<span>")
 				.html(text + "<br>")
