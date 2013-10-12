@@ -21,7 +21,7 @@
 
 function createCharSelectWindow() {
 	tmw.gui.charSelect = {
-		addChoice: addChoice,
+		addChoice: function (character) { choices[character.slot] = character; },
 		draw: draw,
 		charCreationFailed: function (text) {$("#charCreationInfoText").text(text);},
 	};
@@ -31,16 +31,6 @@ function createCharSelectWindow() {
 	var selectedSlot;
 	var animationId = null;
 	var rotateNextTime = 0;
-
-	function addChoice(character) {
-		choices[character.slot] = character;
-		if (tmw.secret && tmw.secret.character === character.name) {
-			var msg = newOutgoingMessage("CMSG_CHAR_SELECT");
-			msg.write8(character.slot);
-			msg.send();
-			tmw.localplayer = character;
-		}
-	}
 
 	function draw() {
 		for (var i in choices) {
@@ -63,6 +53,17 @@ function createCharSelectWindow() {
 	wallpaper.html(win);
 
 	function drawChoices() {
+		if (tmw.secret) {
+			for (var i in choices) {
+				if (tmw.secret.character === choices[i].name) {
+					tmw.localplayer = choices[i];
+					var msg = newOutgoingMessage("CMSG_CHAR_SELECT");
+					msg.write8(choices[i].slot);
+					msg.send();
+					return;
+				}
+			}
+		}
 		var canvas = document.createElement("canvas");
 		canvas.width = win.width();
 		canvas.height = win.height();
