@@ -70,6 +70,7 @@ function createNPCWindow() {
 				.appendTo(dialog);
 		},
 		close: function () {
+			if (!isOpen) return;
 			$("<p>")
 				.css("text-align", "right")
 				.html("<button id='npcCloseButton'>Close</button>")
