@@ -28,10 +28,11 @@ function createPathSearch() {
 	var MAX_HEAP = 150;
 	var heap = new Array(MAX_HEAP + 1);
 	var tp;
+	var movePath = [];
 
 	function move(being, srcX, srcY, dstX, dstY) {
-		console.assert(being.id !== tmw.localplayer.id);
-		being.movePath.length = 0;
+		being.movePixelPath.length = 0;
+		movePath.length = 0;
 		if (being.x) {
 			srcX = Math.floor(being.x / 32);
 			srcY = Math.floor(being.y / 32);
@@ -39,19 +40,46 @@ function createPathSearch() {
 			being.x = srcX * 32 + 16;
 			being.y = srcY * 32 + 16;
 		}
+		being.xFloat = being.x;
+		being.yFloat = being.y;
 		if (srcX === dstX && srcY === dstY) {
+			if (being.x !== dstX * 32 + 16 || being.y !== dstY * 32 + 16) {
+				var dx = (dstX * 32 + 16) - being.x;
+				var dy = (dstY * 32 + 16) - being.y;
+				if (dx || dy) {
+					being.movePixelPath.push({
+						signX: dx ? (dx < 0 ? -1 : 1) : 0,
+						signY: dy ? (dy < 0 ? -1 : 1) : 0,
+						distance: Math.abs(dx) || Math.abs(dy)
+					});
+				}
+			}
 			return;
 		}
-		search(being.movePath, srcX, srcY, dstX, dstY);
-		//console.log(being.id+": ("+srcX+","+srcY+") ("+dstX+","+dstY+") "+being.movePath);
-		if (!being.movePath.length) {
+		search(srcX, srcY, dstX, dstY);
+		for (var i=0; i<movePath.length; i++) {
+			var dir = movePath[i];
+			var signX, signY;
+			switch (dir) {
+				case 1:  signX = 0;  signY = 1;  break;
+				case 3:  signX = -1; signY = 1;  break;
+				case 2:  signX = -1; signY = 0;  break;
+				case 6:  signX = -1; signY = -1; break;
+				case 4:  signX = 0;  signY = -1; break;
+				case 12: signX = 1;  signY = -1; break;
+				case 8:  signX = 1;  signY = 0;  break;
+				case 9:  signX = 1;  signY = 1;  break;
+				default: console.error("None existing direction: " + dir);
+			}
+			being.movePixelPath.push({signX: signX, signY: signY, distance: 32});
+		}
+		if (!movePath.length) {
 			being.x = dstX * 32 + 16;
 			being.y = dstY * 32 + 16;
 			if (being.action === "walk") being.action = "stand";
 			console.error("Path finding failed from ("+srcX+","+srcY+") to ("+dstX+","+dstY+")");
 			return;
 		}
-		being.moveTimer = tmw.timeAnimation;
 		being.action = "walk";
 	}
 
@@ -160,7 +188,7 @@ function createPathSearch() {
 		return true;
 	}
 
-	function search(movePath, x0, y0, x1, y1) {
+	function search(x0, y0, x1, y1) {
 		if (x1 < 0 || x1 >= tmw.map.width || y1 < 0 || y1 >= tmw.map.height)
 			return;
 		var dx = (x1 - x0 < 0) ? -1 : 1;

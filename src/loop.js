@@ -42,6 +42,7 @@ function createLoop() {
 
 	function run(timeAnimation) {
 		requestAnimationId = window.requestAnimationFrame(run);
+		var deltaTime = timeAnimation - tmw.timeAnimation;
 		tmw.timeAnimation = timeAnimation;
 		processMovementInput();
 
@@ -102,6 +103,7 @@ function createLoop() {
 		}
 
 		if (tmw.config.debugRaster) {
+			context.strokeStyle = "Black";
 			context.beginPath();
 			for (var x = startX; x < endX; x++) { // Todo: use pixel for x and y
 				for (var y = startY; y < endY; y++) {
@@ -119,21 +121,42 @@ function createLoop() {
 
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
-			if (being.movePath.length && being.moveTimer < timeAnimation) {
-				var dir = being.movePath.shift();
-				var dx = (dir & 2) ? -1 : ((dir & 8) ? 1 : 0);
-				var dy = (dir & 4) ? -1 : ((dir & 1) ? 1 : 0);
-				being.x += dx * 32;
-				being.y += dy * 32;
-				being.direction =
-					dy === 1 ? 1 :
-					dy === -1 ? 4 :
-					dx === 1 ? 8 : 2;
-				being.moveTimer += being.moveSpeed;
-				if (!being.movePath.length && being.action === "walk") {
-					being.action = "stand";
+
+			// move
+			if (being.movePixelPath.length) {
+				var pixelsMoved = (32 / being.moveSpeed) * deltaTime;
+				while (true) {
+					var cur = being.movePixelPath[0];
+					being.direction =
+						cur.signY === 1 ? 1 :
+						cur.signY === -1 ? 4 :
+						cur.signX === 1 ? 8 : 2;
+					var rest = cur.distance - pixelsMoved;
+					if (rest === 0) {
+						being.xFloat += cur.signX * pixelsMoved;
+						being.yFloat += cur.signY * pixelsMoved;
+						being.movePixelPath.shift();
+						break;
+					} else if (rest > 0) {
+						being.xFloat += cur.signX * pixelsMoved;
+						being.yFloat += cur.signY * pixelsMoved;
+						being.movePixelPath[0].distance -= pixelsMoved;
+						break;
+					} else { // rest < 0
+						being.xFloat += cur.signX * cur.distance;
+						being.yFloat += cur.signY * cur.distance;
+						pixelsMoved -= cur.distance;
+						being.movePixelPath.shift();
+						if (!being.movePixelPath.length)
+							break;
+					}
 				}
+				being.x = Math.floor(being.xFloat);
+				being.y = Math.floor(being.yFloat);
+				if (!being.movePixelPath.length)
+					being.action = "stand";
 			}
+
 			if (being.isSelected)
 				tmw.selectedBeing.draw(scrollX, scrollY, timeAnimation);
 			drawSprites(being, scrollX, scrollY, timeAnimation);

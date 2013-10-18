@@ -23,7 +23,7 @@ function createBeing(being) {
 	being.action = "stand";
 	being.direction = 1;
 	being.equipment = {};
-	being.movePath = [];
+	being.movePixelPath = [];
 	var job = being.job;
 	if (job <= 25 || (job >= 4001 && job <= 4049))
 		being.type = "PLAYER";
@@ -100,6 +100,7 @@ function processPlayerPacket(msg, msgType) {
 			case 2: being.action = "sit"; break;
 			default: console.error("Ignoring action "+action+" for being "+id+" "+being.name);
 		}
+		being.movePixelPath.length = 0;
 	} else if (msgType === "SMSG_PLAYER_MOVE") {
 		msg.skip(1);
 	}
@@ -125,6 +126,7 @@ tmw.handler.SMSG_BEING_REMOVE = function (msg) {
 	if (being.isSelected) tmw.selectedBeing.clear();
 	if (msg.read8() === 1 && being.type !== "NPC") {
 		being.action = "dead";
+		being.movePixelPath.length = 0;
 	} else {
 		tmw.gui.social.removeBeingPresent(id);
 		delete tmw.beings[id];
@@ -325,9 +327,9 @@ tmw.handler.SMSG_BEING_SELFEFFECT = function (msg) {
 tmw.handler.SMSG_PLAYER_STOP = function (msg) {
 	var being = tmw.beings[msg.read32()];
 	if (!being) return;
-	var x = msg.read16();
-	var y = msg.read16();
-	tmw.path.move(being, Math.floor(being.x / 32), Math.floor(being.y / 32), x, y);//Todo: Jump?
+	being.x = msg.read16() * 32 + 16;
+	being.y = msg.read16() * 32 + 16;
+	being.movePixelPath.length = 0;
 };
 
 tmw.handler.SMSG_BEING_RESURRECT = function (msg) {
