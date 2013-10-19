@@ -52,7 +52,8 @@ tmw.state.STATE_LOGIN = function () {
 			"<label for='formPassword'>Password</label>" +
 			"<input type='password' id='formPassword' class='ui-widget-content ui-corner-all'>" +
 			"<button id='connectButton'>Play</button>" +
-			"</form>");
+			"</form>" +
+			"<div id='loginVersion'></div>");
 	$("#loginForm>input")
 		.css("display", "block")
 		.css("width", "95%")
@@ -76,6 +77,11 @@ tmw.state.STATE_LOGIN = function () {
 			console.log("Server: " + server + ", Name: " + name);
 			tmw.net.setLoginData(name, password);
 			tmw.state.set("STATE_LOGIN_ATTEMPT", {server: server, port: 6901});});
+	$("#loginVersion")
+		.css("position", "absolute")
+		.css("bottom", 0)
+		.css("right", 0)
+		.text("Version: " + chrome.runtime.getManifest().version);
 	if (tmw.secret) {
 		$("#formName").attr("value", tmw.secret.name);
 		$("#formPassword").attr("value", tmw.secret.password);

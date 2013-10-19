@@ -39,6 +39,8 @@ var tmw = {
 window.onload = main;
 
 function main() {
+	chrome.runtime.requestUpdateCheck($.noop);
+
 	tmw.debug = false;
 	createNetwork();
 	tmw.msgOutBuffer = new ArrayBuffer(65536);
