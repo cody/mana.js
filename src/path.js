@@ -42,43 +42,35 @@ function createPathSearch() {
 		}
 		being.xFloat = being.x;
 		being.yFloat = being.y;
+		var posX = srcX * 32 + 16;
+		var posY = srcY * 32 + 16;
 		if (srcX === dstX && srcY === dstY) {
-			if (being.x !== dstX * 32 + 16 || being.y !== dstY * 32 + 16) {
-				var dx = (dstX * 32 + 16) - being.x;
-				var dy = (dstY * 32 + 16) - being.y;
-				if (dx || dy) {
-					being.movePixelPath.push({
-						signX: dx ? (dx < 0 ? -1 : 1) : 0,
-						signY: dy ? (dy < 0 ? -1 : 1) : 0,
-						distance: Math.abs(dx) || Math.abs(dy)
-					});
-				}
-			}
+			being.x = posX;
+			being.y = posY;
+			being.action = "stand";
 			return;
 		}
 		search(srcX, srcY, dstX, dstY);
-		for (var i=0; i<movePath.length; i++) {
-			var dir = movePath[i];
-			var signX, signY;
-			switch (dir) {
-				case 1:  signX = 0;  signY = 1;  break;
-				case 3:  signX = -1; signY = 1;  break;
-				case 2:  signX = -1; signY = 0;  break;
-				case 6:  signX = -1; signY = -1; break;
-				case 4:  signX = 0;  signY = -1; break;
-				case 12: signX = 1;  signY = -1; break;
-				case 8:  signX = 1;  signY = 0;  break;
-				case 9:  signX = 1;  signY = 1;  break;
-				default: console.error("None existing direction: " + dir);
-			}
-			being.movePixelPath.push({signX: signX, signY: signY, distance: 32});
-		}
 		if (!movePath.length) {
 			being.x = dstX * 32 + 16;
 			being.y = dstY * 32 + 16;
-			if (being.action === "walk") being.action = "stand";
+			being.action = "stand";
 			console.error("Path finding failed from ("+srcX+","+srcY+") to ("+dstX+","+dstY+")");
 			return;
+		}
+		for (var i=0; i<movePath.length; i++) {
+			switch (movePath[i]) {
+				case 1: posY += 32; break;
+				case 3: posX -= 32; posY += 32; break;
+				case 2: posX -= 32; break;
+				case 6: posX -= 32; posY -= 32; break;
+				case 4: posY -= 32; break;
+				case 12: posX += 32; posY -= 32; break;
+				case 8: posX += 32; break;
+				case 9: posX += 32; posY += 32; break;
+				default: console.error("None existing direction: " + movePath[i]);
+			}
+			being.movePixelPath.push({dstX: posX, dstY: posY});
 		}
 		being.action = "walk";
 	}

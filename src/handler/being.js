@@ -329,7 +329,10 @@ tmw.handler.SMSG_PLAYER_STOP = function (msg) {
 	if (!being) return;
 	being.x = msg.read16() * 32 + 16;
 	being.y = msg.read16() * 32 + 16;
-	being.movePixelPath.length = 0;
+	if (being.movePixelPath.length) {
+		being.movePixelPath.length = 0;
+		being.action = "stand";
+	}
 };
 
 tmw.handler.SMSG_BEING_RESURRECT = function (msg) {

@@ -125,36 +125,58 @@ function createLoop() {
 			// move
 			if (being.movePixelPath.length) {
 				var pixelsMoved = (32 / being.moveSpeed) * deltaTime;
-				while (true) {
-					var cur = being.movePixelPath[0];
+				for (var doLoop=true; doLoop;) {
+					doLoop = false;
+					var doShift = true;
+					var dstX = being.movePixelPath[0].dstX;
+					var dstY = being.movePixelPath[0].dstY;
+					var dx = dstX - being.xFloat;
+					var dy = dstY - being.yFloat;
+					console.assert(dx || dy);
 					being.direction =
-						cur.signY === 1 ? 1 :
-						cur.signY === -1 ? 4 :
-						cur.signX === 1 ? 8 : 2;
-					var rest = cur.distance - pixelsMoved;
-					if (rest === 0) {
-						being.xFloat += cur.signX * pixelsMoved;
-						being.yFloat += cur.signY * pixelsMoved;
+						dy > 0 ? 1 :
+						dy < 0 ? 4 :
+						dx > 0 ? 8 : 2;
+					var remainderX = 0;
+					if (dx) {
+						remainderX = Math.abs(dx) - pixelsMoved;
+						if (remainderX > 0.01) {
+							being.xFloat += dx < 0 ? -pixelsMoved : pixelsMoved;
+							doShift = false;
+						} else if (remainderX < -0.01) {
+							being.xFloat = dstX;
+							doLoop = true;
+						} else {
+							being.xFloat = dstX;
+						}
+					}
+					var remainderY = 0;
+					if (dy) {
+						remainderY = Math.abs(dy) - pixelsMoved;
+						if (remainderY > 0.01) {
+							being.yFloat += dy < 0 ? -pixelsMoved : pixelsMoved;
+							doShift = false;
+						} else if (remainderY < -0.01) {
+							being.yFloat = dstY;
+							doLoop = true;
+						} else {
+							being.yFloat = dstY;
+						}
+					}
+					if (doShift) {
 						being.movePixelPath.shift();
-						break;
-					} else if (rest > 0) {
-						being.xFloat += cur.signX * pixelsMoved;
-						being.yFloat += cur.signY * pixelsMoved;
-						being.movePixelPath[0].distance -= pixelsMoved;
-						break;
-					} else { // rest < 0
-						being.xFloat += cur.signX * cur.distance;
-						being.yFloat += cur.signY * cur.distance;
-						pixelsMoved -= cur.distance;
-						being.movePixelPath.shift();
-						if (!being.movePixelPath.length)
-							break;
+						if (!being.movePixelPath.length) {
+							being.action = "stand";
+							doLoop = false;
+						}
+					}
+					if (doLoop) {
+						pixelsMoved = -Math.min(remainderX, remainderY);
+						console.assert(pixelsMoved > 0);
 					}
 				}
-				being.x = Math.floor(being.xFloat);
-				being.y = Math.floor(being.yFloat);
-				if (!being.movePixelPath.length)
-					being.action = "stand";
+				being.x = Math.round(being.xFloat);
+				being.y = Math.round(being.yFloat);
 			}
 
 			if (being.isSelected)
