@@ -26,8 +26,6 @@ function createGui() {
 		.css("position", "absolute")
 		.css("right", 1)
 		.css("bottom", 1)
-		.css("width", 46)
-		.css("height", 20)
 		.css("padding", 2)
 		.css("background-color", "white")
 		.hide()
