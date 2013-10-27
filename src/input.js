@@ -20,7 +20,15 @@
 "use strict";
 
 function createInput() {
-	console.assert(!tmw.input);
+	tmw.input = {
+		getArrowKeys: function () {
+			return dirKeys;
+		},
+		getAttackKey: function () {
+			return attackKey && tmw.localplayer.action !== "dead";
+		},
+	};
+
 	var dirKeys = 0;
 	var attackKey = false;
 	
@@ -132,27 +140,11 @@ function createInput() {
 				tmw.localplayer.action = "stand";
 		}
 	};
-	
-	tmw.input = {
-		getArrowKeys: function () {
-			return dirKeys;
-		},
-		getAttackKey: function () {
-			return attackKey && tmw.localplayer.action !== "dead";
-		},
-		start: {
-		
-		},
-		stop: {
-		
-		},
-	};
 }
 
 function processMovementInput() {
-	if (tmw.localplayer.action === "dead") return; // Todo: Npc and storage
 	var arrow = tmw.input.getArrowKeys();
-	if (!arrow || !tmw.net.packetLimiter("CMSG_PLAYER_CHANGE_DEST")) return;
+	if (!arrow || tmw.localplayer.action === "dead") return; // Todo: Npc and storage
 	var posX = Math.floor(tmw.localplayer.x / 32);
 	var posY = Math.floor(tmw.localplayer.y / 32);
 	var dx = 0;
@@ -176,11 +168,16 @@ function processMovementInput() {
 	} else {
 		return;
 	}
-	tmw.localplayer.x += dx * 32;
-	tmw.localplayer.y += dy * 32;
-	tmw.localplayer.action = "walk"; // Todo: stop attack
-	if (dx) tmw.localplayer.direction = arrow & 10;
+	if (dx === 0 && dy === 0) return;
+	tmw.localplayer.movePixelPath = [{
+		dstX: (posX + dx) * 32 + 16,
+		dstY: (posY + dy) * 32 + 16
+	}];
+	tmw.localplayer.xFloat = tmw.localplayer.x;
+	tmw.localplayer.yFloat = tmw.localplayer.y;
+	tmw.localplayer.action = "walk";
 	if (dy) tmw.localplayer.direction = arrow & 5;
+	else if (dx) tmw.localplayer.direction = arrow & 10;
 	var msg = newOutgoingMessage("CMSG_PLAYER_CHANGE_DEST");
 	msg.writeCoordinates(posX + dx, posY + dy);
 	msg.send();

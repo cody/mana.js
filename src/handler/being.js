@@ -79,11 +79,11 @@ function processPlayerPacket(msg, msgType) {
 	being.sex = msg.read8();
 	if (msgType === "SMSG_PLAYER_MOVE") {
 		var coord = msg.readCoordinatePair();
-		tmw.path.move(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
+		tmw.path.findPath(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
 	} else {
 		var coord = msg.readCoordinate();
 		if (being.x) {
-			tmw.path.move(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
+			tmw.path.findPath(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
 				coord.x, coord.y);
 		} else {
 			being.x = coord.x * 32 + 16;
@@ -208,11 +208,11 @@ function processBeingPacket(msg, msgType) {
 	being.sex = msg.read8();
 	if (msgType === "SMSG_BEING_MOVE") {
 		var coord = msg.readCoordinatePair();
-		tmw.path.move(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
+		tmw.path.findPath(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
 	} else { // SMSG_BEING_VISIBLE
 		var coord = msg.readCoordinate();
 		if (being.x) {
-			tmw.path.move(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
+			tmw.path.findPath(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
 				coord.x, coord.y);
 		} else {
 			being.x = coord.x * 32 + 16;

@@ -183,7 +183,6 @@ function createNetwork() {
 		"CMSG_ITEM_PICKUP": {rate: 400, nextTime: 0},
 		"CMSG_PLAYER_ATTACK": {rate: 1000, nextTime: 0},
 		"CMSG_PLAYER_CHANGE_ACT": {rate: 1000, nextTime: 0},
-		"CMSG_PLAYER_CHANGE_DEST": {rate: 150, nextTime: 0},
 		"CMSG_PLAYER_INVENTORY_DROP": {rate: 50, nextTime: 0},
 		"CMSG_PLAYER_EMOTE": {rate: 1000, nextTime: 0},
 	};
@@ -194,7 +193,6 @@ function createNetwork() {
 		var rate;
 		switch (msgName) {
 			case "CMSG_PLAYER_ATTACK": rate = tmw.localplayer.attackSpeed; break;
-			case "CMSG_PLAYER_CHANGE_DEST": rate = tmw.localplayer.moveSpeed; break;
 			default: rate = limiterTable[msgName].rate;
 		}
 		limiterTable[msgName].nextTime = Date.now() + rate;

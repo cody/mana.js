@@ -20,7 +20,7 @@
 "use strict";
 
 function readCharacterData(msg) {
-	var c = {type: "PLAYER", action: "stand", direction: 1};
+	var c = {type: "PLAYER", action: "stand", direction: 1, movePixelPath: []};
 	c.id = tmw.net.token.accountId;
 	c.attributes = {};
 	c.states = {};

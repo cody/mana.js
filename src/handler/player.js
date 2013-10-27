@@ -20,10 +20,10 @@
 "use strict";
 
 tmw.handler.SMSG_WALK_RESPONSE = function (msg) {
-    msg.skip(4); // tick
-    var coord = msg.readCoordinatePair();
-	tmw.localplayer.xServer = coord.dstX;
-	tmw.localplayer.yServer = coord.dstY;
+    // msg.skip(4); // tick
+    // var coord = msg.readCoordinatePair();
+	// tmw.localplayer.xServer = coord.dstX;
+	// tmw.localplayer.yServer = coord.dstY;
 };
 
 tmw.handler.SMSG_PLAYER_ARROW_MESSAGE = function (msg) {
@@ -226,6 +226,7 @@ tmw.handler.SMSG_PLAYER_WARP = function (msg) {
 	tmw.maps.loadMap(msg.readString(16, true));
 	tmw.localplayer.x = msg.read16() * 32 + 16;
 	tmw.localplayer.y = msg.read16() * 32 + 16;
+	tmw.localplayer.movePixelPath.length = 0;
 };
 
 function playerChangeDirection(dir) {

@@ -35,7 +35,8 @@ function createLoop() {
 			game = $("#game");
 		},
 		stop: function () {
-			if (requestAnimationId) window.cancelAnimationFrame(requestAnimationId);
+			if (requestAnimationId)
+				window.cancelAnimationFrame(requestAnimationId);
 			requestAnimationId = null;
 		},
 	};
@@ -44,11 +45,19 @@ function createLoop() {
 		requestAnimationId = window.requestAnimationFrame(run);
 		var deltaTime = timeAnimation - tmw.timeAnimation;
 		tmw.timeAnimation = timeAnimation;
-		processMovementInput();
 
-		if (!tmw.map.width) return;
+		console.assert(tmw.map.width);
 
-		if (tmw.input.getAttackKey()) {
+		if (!tmw.localplayer.movePixelPath.length) {
+			processMovementInput();
+		}
+		if (tmw.localplayer.movePixelPath.length) {
+			var pixelsMoved = (32 / tmw.localplayer.moveSpeed) * deltaTime;
+			move(tmw.localplayer, pixelsMoved);
+			if (!tmw.localplayer.movePixelPath.length) {
+				processMovementInput();
+			}
+		} else if (tmw.input.getAttackKey()) {
 			if (!tmw.selectedBeing.get())
 				tmw.selectedBeing.select("MONSTER");
 			var selected = tmw.selectedBeing.get();
@@ -82,7 +91,7 @@ function createLoop() {
 		var startX = Math.max(0, Math.floor(scrollX / 32));
 		var startY = Math.max(0, Math.floor(scrollY / 32));
 		var endX = Math.min(tmw.map.width, Math.ceil(game.width() + scrollX / 32));
-		var endY = Math.min(tmw.map.height, Math.ceil((game.height() + scrollY) / 32));
+		var endY = Math.min(tmw.map.height, 2 + Math.ceil((game.height() + scrollY) / 32));
 
 		// tiles
 		var left;
@@ -122,61 +131,9 @@ function createLoop() {
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
 
-			// move
 			if (being.movePixelPath.length) {
 				var pixelsMoved = (32 / being.moveSpeed) * deltaTime;
-				for (var doLoop=true; doLoop;) {
-					doLoop = false;
-					var doShift = true;
-					var dstX = being.movePixelPath[0].dstX;
-					var dstY = being.movePixelPath[0].dstY;
-					var dx = dstX - being.xFloat;
-					var dy = dstY - being.yFloat;
-					console.assert(dx || dy);
-					being.direction =
-						dy > 0 ? 1 :
-						dy < 0 ? 4 :
-						dx > 0 ? 8 : 2;
-					var remainderX = 0;
-					if (dx) {
-						remainderX = Math.abs(dx) - pixelsMoved;
-						if (remainderX > 0.01) {
-							being.xFloat += dx < 0 ? -pixelsMoved : pixelsMoved;
-							doShift = false;
-						} else if (remainderX < -0.01) {
-							being.xFloat = dstX;
-							doLoop = true;
-						} else {
-							being.xFloat = dstX;
-						}
-					}
-					var remainderY = 0;
-					if (dy) {
-						remainderY = Math.abs(dy) - pixelsMoved;
-						if (remainderY > 0.01) {
-							being.yFloat += dy < 0 ? -pixelsMoved : pixelsMoved;
-							doShift = false;
-						} else if (remainderY < -0.01) {
-							being.yFloat = dstY;
-							doLoop = true;
-						} else {
-							being.yFloat = dstY;
-						}
-					}
-					if (doShift) {
-						being.movePixelPath.shift();
-						if (!being.movePixelPath.length) {
-							being.action = "stand";
-							doLoop = false;
-						}
-					}
-					if (doLoop) {
-						pixelsMoved = -Math.min(remainderX, remainderY);
-						console.assert(pixelsMoved > 0);
-					}
-				}
-				being.x = Math.round(being.xFloat);
-				being.y = Math.round(being.yFloat);
+				move(being, pixelsMoved);
 			}
 
 			if (being.isSelected)
@@ -227,6 +184,61 @@ function createLoop() {
 		}
 
 		drawParticleText(scrollX, scrollY);
+	}
+
+	function move(being, pixelsMoved) {
+		for (var doLoop=true; doLoop;) {
+			doLoop = false;
+			var doShift = true;
+			var dstX = being.movePixelPath[0].dstX;
+			var dstY = being.movePixelPath[0].dstY;
+			var dx = dstX - being.xFloat;
+			var dy = dstY - being.yFloat;
+			console.assert(dx || dy);if(!(dx || dy))debugger;
+			being.direction =
+				dy > 0 ? 1 :
+				dy < 0 ? 4 :
+				dx > 0 ? 8 : 2;
+			var remainderX = 0;
+			if (dx) {
+				remainderX = Math.abs(dx) - pixelsMoved;
+				if (remainderX > 0.01) {
+					being.xFloat += dx < 0 ? -pixelsMoved : pixelsMoved;
+					doShift = false;
+				} else if (remainderX < -0.01) {
+					being.xFloat = dstX;
+					doLoop = true;
+				} else {
+					being.xFloat = dstX;
+				}
+			}
+			var remainderY = 0;
+			if (dy) {
+				remainderY = Math.abs(dy) - pixelsMoved;
+				if (remainderY > 0.01) {
+					being.yFloat += dy < 0 ? -pixelsMoved : pixelsMoved;
+					doShift = false;
+				} else if (remainderY < -0.01) {
+					being.yFloat = dstY;
+					doLoop = true;
+				} else {
+					being.yFloat = dstY;
+				}
+			}
+			if (doShift) {
+				being.movePixelPath.shift();
+				if (!being.movePixelPath.length) {
+					being.action = "stand";
+					doLoop = false;
+				}
+			}
+			if (doLoop) {
+				pixelsMoved = -Math.min(remainderX, remainderY);
+				console.assert(pixelsMoved > 0);
+			}
+		}
+		being.x = Math.round(being.xFloat);
+		being.y = Math.round(being.yFloat);
 	}
 
 	function drawEmote(being, scrollX, scrollY) {

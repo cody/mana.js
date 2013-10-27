@@ -21,7 +21,7 @@
 
 function createPathSearch() {
 	tmw.path = {
-		move: move,
+		findPath: findPath,
 	};
 
 	var MAX_WALKPATH = 48;
@@ -30,7 +30,7 @@ function createPathSearch() {
 	var tp;
 	var movePath = [];
 
-	function move(being, srcX, srcY, dstX, dstY) {
+	function findPath(being, srcX, srcY, dstX, dstY) {
 		being.movePixelPath.length = 0;
 		movePath.length = 0;
 		if (being.x) {
