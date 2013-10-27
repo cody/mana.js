@@ -48,26 +48,28 @@ function createLoop() {
 
 		console.assert(tmw.map.width);
 
-		if (!tmw.localplayer.movePixelPath.length) {
-			processMovementInput();
-		}
-		if (tmw.localplayer.movePixelPath.length) {
-			var pixelsMoved = (32 / tmw.localplayer.moveSpeed) * deltaTime;
-			move(tmw.localplayer, pixelsMoved);
+		if (tmw.localplayer.action !== "dead" && !tmw.gui.npc.isOpen()) {
 			if (!tmw.localplayer.movePixelPath.length) {
 				processMovementInput();
 			}
-		} else if (tmw.input.getAttackKey()) {
-			if (!tmw.selectedBeing.get())
-				tmw.selectedBeing.select("MONSTER");
-			var selected = tmw.selectedBeing.get();
-			if (selected && selected.type !== "NPC") {
-				if (tmw.net.packetLimiter("CMSG_PLAYER_ATTACK")) {
-					tmw.localplayer.action = "attack";
-					var msg = newOutgoingMessage("CMSG_PLAYER_ATTACK");
-					msg.write32(selected.id);
-					msg.write8(0);
-					msg.send();
+			if (tmw.localplayer.movePixelPath.length) {
+				var pixelsMoved = (32 / tmw.localplayer.moveSpeed) * deltaTime;
+				move(tmw.localplayer, pixelsMoved);
+				if (!tmw.localplayer.movePixelPath.length) {
+					processMovementInput();
+				}
+			} else if (tmw.input.getAttackKey()) {
+				if (!tmw.selectedBeing.get())
+					tmw.selectedBeing.select("MONSTER");
+				var selected = tmw.selectedBeing.get();
+				if (selected && selected.type !== "NPC") {
+					if (tmw.net.packetLimiter("CMSG_PLAYER_ATTACK")) {
+						tmw.localplayer.action = "attack";
+						var msg = newOutgoingMessage("CMSG_PLAYER_ATTACK");
+						msg.write32(selected.id);
+						msg.write8(0);
+						msg.send();
+					}
 				}
 			}
 		}

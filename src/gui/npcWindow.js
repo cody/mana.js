@@ -58,6 +58,12 @@ function createNPCWindow() {
 		},
 		message: function (id, text) {
 			if (!isOpen) {
+				if (tmw.localplayer.action === "walk") {
+					tmw.localplayer.action = "stand";
+					tmw.localplayer.movePixelPath = 0;
+					tmw.localplayer.x = Math.floor(tmw.localplayer.x / 32) * 32 + 16;
+					tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
+				}
 				npcId = id;
 				win.toggle();
 				isOpen = true;

@@ -144,7 +144,7 @@ function createInput() {
 
 function processMovementInput() {
 	var arrow = tmw.input.getArrowKeys();
-	if (!arrow || tmw.localplayer.action === "dead") return; // Todo: Npc and storage
+	if (!arrow) return;
 	var posX = Math.floor(tmw.localplayer.x / 32);
 	var posY = Math.floor(tmw.localplayer.y / 32);
 	var dx = 0;

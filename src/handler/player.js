@@ -122,6 +122,11 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_1  = function (msg) {
 		default: console.error("Unknown type in SMSG_PLAYER_STAT_UPDATE_1: " + type);
 	}
 	if (tmw.localplayer.attributes.hp === 0 && tmw.localplayer.action !== "dead") {
+		if (tmw.localplayer.action === "walk") {
+			tmw.localplayer.movePixelPath = 0;
+			tmw.localplayer.x = Math.floor(tmw.localplayer.x / 32) * 32 + 16;
+			tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
+		}
 		tmw.localplayer.action = "dead";
 		tmw.selectedBeing.clear();
 		$("<div>").html("You have died!")
