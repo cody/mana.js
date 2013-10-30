@@ -193,6 +193,7 @@ function createCharSelectWindow() {
 		var context = canvas.getContext("2d");
 		tmw.context = context;
 		blankChar.sex = tmw.net.token.sex;
+		blankChar.template = tmw.playerSet[blankChar.sex ? "male" : "female"];
 		blankChar.equipment.topClothes = tmw.itemDB[1202];
 		blankChar.equipment.bottomClothes = tmw.itemDB[881];
 		selectColor.dispatchEvent(new Event("change"));

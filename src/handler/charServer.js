@@ -26,6 +26,7 @@ function readCharacterData(msg) {
 	c.states = {};
 	c.equipment = {};
 	c.sex = tmw.net.token.sex;
+	c.template = tmw.playerSet[c.sex ? "male" : "female"];
 	c.charId = msg.read32();
 	c.attributes.xp = msg.read32();
 	c.attributes.money = msg.read32();

@@ -164,25 +164,27 @@ function readNpcsXml() {
 
 function readPlayerSpritesFemale() {
 	var png = loadPngFromZip("graphics/sprites/player_female_base.png", function () {
-		readPlayerSprite(tmw.playerSpriteFemale);
+		readPlayerSprite(tmw.playerSet.female);
 	});
-	tmw.playerSpriteFemale = {variable: "playerSpriteFemale", xml: this.responseXML, png: png};
+	tmw.playerSet.female = {variable: "female", xml: this.responseXML, png: png};
 }
 
 function readPlayerSpritesMale() {
 	var png = loadPngFromZip("graphics/sprites/player_male_base.png", function () {
-		readPlayerSprite(tmw.playerSpriteMale);
+		readPlayerSprite(tmw.playerSet.male);
 	});
-	tmw.playerSpriteMale = {variable: "playerSpriteMale", xml: this.responseXML, png: png};
+	tmw.playerSet.male = {variable: "male", xml: this.responseXML, png: png};
 }
 
 function readPlayerSprite(args) {
-	tmw[args.variable] = {width: 64, height: 64};
+	tmw.playerSet[args.variable] = {};
+	var frames = {width: 64, height: 64};
+	tmw.playerSet[args.variable].frames = frames;
 	var index, end, offsetX, offsetY, delay;
 	var actions = args.xml.getElementsByTagName("action");
 	for (var i=0; i<actions.length; i++) {
 		var actionObj = {};
-		tmw[args.variable][actions[i].attributes["name"].value] = actionObj;
+		frames[actions[i].attributes["name"].value] = actionObj;
 		var animations = actions[i].getElementsByTagName("animation");
 		for (var j=0; j<animations.length; j++) {
 			var dir;
@@ -194,7 +196,7 @@ function readPlayerSprite(args) {
 				case "right": dir = 8; break;
 				default: dir = "unknown"; console.error("Sprite: Unknown direction");
 			}
-			var frames = actionObj[dir] = [];
+			var frameSet = actionObj[dir] = [];
 			var nodes = animations[j].children;
 			for (var n=0; n<nodes.length; n++) {
 				var node = nodes[n];
@@ -221,7 +223,7 @@ function readPlayerSprite(args) {
 		canvas.height = 64;
 		var ctx = canvas.getContext("2d");
 		ctx.drawImage(png, left, top, 64, 64, 0, 0 ,64, 64);
-		frames.push({canvas: canvas, delay: delay, offsetX: offsetX, offsetY: offsetY});
+		frameSet.push({canvas: canvas, delay: delay, offsetX: offsetX, offsetY: offsetY});
 	}
 	tmw.loadDataCounter.readXmlFinished();
 }

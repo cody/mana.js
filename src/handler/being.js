@@ -25,13 +25,34 @@ function createBeing(being) {
 	being.equipment = {};
 	being.movePixelPath = [];
 	var job = being.job;
-	if (job <= 25 || (job >= 4001 && job <= 4049))
+	if (job <= 25 || (job >= 4001 && job <= 4049)) {
 		being.type = "PLAYER";
-	else if (job >= 46 && job <= 1000)
+	} else if (job >= 46 && job <= 1000) {
 		being.type = "NPC";
-	else if (job > 1000 && job <= 2000)
+		var npc = tmw.npcDB[job];
+		if (npc.frames === undefined) {
+			npc.frames = null;
+			if (npc.sprites[0]) {
+				var sprite = npc.sprites[0].path.split("|");
+				var xhr = loadXmlFromZip("graphics/sprites/" + sprite[0], loadFrames);
+				xhr.mob = npc;
+				if (sprite.length === 2) xhr.color = [sprite[1]];
+				xhr.variant = npc.sprites[0].variant;
+			}
+		}
+		being.template = npc;
+	} else if (job > 1000 && job <= 2000) {
 		being.type = "MONSTER";
-	else if (job === 45) {
+		var monster = tmw.monsterDB[being.job];
+		if (monster.frames === undefined) {
+			monster.frames = null;
+			var sprite = monster.sprites[0].split("|");
+			var xhr = loadXmlFromZip("graphics/sprites/" + sprite[0], loadFrames);
+			xhr.mob = monster;
+			if (sprite.length === 2) xhr.color = [sprite[1]];
+		}
+		being.template = monster;
+	} else if (job === 45) {
 		return false; // Skip portals
 	} else {
 		being.type = "UNKNOWN";
@@ -77,6 +98,7 @@ function processPlayerPacket(msg, msgType) {
 	being.statusEffects3 = msg.read16();  // opt3 // Todo
 	msg.skip(1); // karma
 	being.sex = msg.read8();
+	being.template = tmw.playerSet[being.sex ? "male" : "female"];
 	if (msgType === "SMSG_PLAYER_MOVE") {
 		var coord = msg.readCoordinatePair();
 		tmw.path.findPath(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);

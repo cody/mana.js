@@ -143,37 +143,8 @@ function colorToChannels(color) {
 }
 
 function drawSprites(being, scrollX, scrollY, timeAnimation) {
-	var frames, frame, dir, left, top;
-	switch (being.type) {
-		case "PLAYER":
-			frames = being.sex ? tmw.playerSpriteMale : tmw.playerSpriteFemale;
-			break;
-		case "NPC":
-			var npc = tmw.npcDB[being.job];
-			if (npc.frames === undefined) {
-				npc.frames = null;
-				if (!npc.sprites[0]) break;
-				var sprite = npc.sprites[0].path.split("|");
-				var xhr = loadXmlFromZip("graphics/sprites/" + sprite[0], loadFrames);
-				xhr.mob = npc;
-				if (sprite.length === 2) xhr.color = [sprite[1]];
-				xhr.variant = npc.sprites[0].variant;
-			}
-			frames = npc.frames;
-			break;
-		case "MONSTER":
-			var monster = tmw.monsterDB[being.job];
-			if (monster.frames === undefined) {
-				monster.frames = null;
-				var sprite = monster.sprites[0].split("|");
-				var xhr = loadXmlFromZip("graphics/sprites/" + sprite[0], loadFrames);
-				xhr.mob = monster;
-				if (sprite.length === 2) xhr.color = [sprite[1]];
-			}
-			frames = monster.frames;
-			break;
-		default: console.error("Being type not handled: " + being.type);
-	}
+	var frame, dir, left, top;
+	var frames = being.template.frames;
 	if (!frames) return;
 	if (!frames[being.action]) being.action = "stand";
 	if (!frames[being.action][being.direction]) being.direction = 1;
