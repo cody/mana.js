@@ -181,7 +181,7 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
 	if (being.type === "PLAYER") {
 		var visibleEquipment = ["shoes", "gloves", "bottomClothes", "topClothes",
-			"topClothes", "hair", "hat", "weapon"];
+			"topClothes", "misc2", "hair", "hat", "weapon"];
 		for (var slot in visibleEquipment) {
 			var equip = being.equipment[visibleEquipment[slot]];
 			if (!equip) continue;
@@ -195,9 +195,7 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 				else if (being.sex === 0 && equip.spriteFemale)
 					s = equip.spriteFemale.split("|");
 				else
-					console.error("No sprite found for tmw.beings[" + being.id +
-						"] slot " + visibleEquipment[slot] + " item " + equip.name);
-				if (!s) continue;
+					continue;
 				var xhr = loadXmlFromZip("graphics/sprites/" + s[0], loadFrames);
 				xhr.mob = equip;
 				if (s.length === 2) xhr.color = [s[1]];
