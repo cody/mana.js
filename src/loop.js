@@ -257,7 +257,6 @@ function createLoop() {
 	function drawSpeech(being, scrollX, scrollY) {
 		if (tmw.timeAnimation > being.speechTimeout) {
 			being.speechText = null;
-			being.speechTimeout = null;
 			return;
 		}
 		var left = being.x - scrollX;

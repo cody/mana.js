@@ -26,7 +26,6 @@ function cleanOutMap() {
 	tmw.gui.shop.close();
 	tmw.localplayer.action = "stand";
 	tmw.localplayer.speechText = null;
-	tmw.localplayer.speechTimeout = null;
 	tmw.selectedBeing.clear();
 	tmw.textParticle.length = 0;
 }

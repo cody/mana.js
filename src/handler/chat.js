@@ -42,7 +42,8 @@ tmw.handler.SMSG_PLAYER_CHAT = function (msg) {
 	}
 	tmw.gui.chat.log(name, text, "player");
 	tmw.localplayer.speechText = text;
-	tmw.localplayer.speechTimeout = tmw.timeAnimation + 5000;
+	tmw.localplayer.speechTimeout =
+		tmw.localplayer.speechTimeout ? tmw.timeAnimation + 5000 : 1; // skip motd
 };
 
 tmw.handler.SMSG_GM_CHAT = function (msg) {
