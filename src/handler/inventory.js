@@ -20,7 +20,7 @@
 "use strict";
 
 tmw.handler.SMSG_PLAYER_ATTACK_RANGE = function (msg) {
-	tmw.localplayer.attackRange = msg.read16() + 1;
+	tmw.localplayer.attackRange = Math.max(2, msg.read16());
 	tmw.gui.status.updateAttackRange();
 };
 

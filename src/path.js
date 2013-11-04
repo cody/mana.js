@@ -47,7 +47,10 @@ function createPathSearch() {
 		if (srcX === dstX && srcY === dstY) {
 			being.x = posX;
 			being.y = posY;
-			being.action = "stand";
+			if (being.action !== "stand") {
+				being.action = "stand";
+				being.sprite = null;
+			}
 			return;
 		}
 		search(srcX, srcY, dstX, dstY);
@@ -55,6 +58,7 @@ function createPathSearch() {
 			being.x = dstX * 32 + 16;
 			being.y = dstY * 32 + 16;
 			being.action = "stand";
+			being.sprite = null;
 			console.error("Path finding failed from ("+srcX+","+srcY+") to ("+dstX+","+dstY+")");
 			return;
 		}
@@ -72,7 +76,10 @@ function createPathSearch() {
 			}
 			being.movePixelPath.push({dstX: posX, dstY: posY});
 		}
-		being.action = "walk";
+		if (being.action !== "walk") {
+			being.action = "walk";
+			being.sprite = null;
+		}
 	}
 
 	function calc_index(x,y) {

@@ -60,6 +60,7 @@ function createNPCWindow() {
 			if (!isOpen) {
 				if (tmw.localplayer.action === "walk") {
 					tmw.localplayer.action = "stand";
+					tmw.localplayer.sprite = null;
 					tmw.localplayer.movePixelPath = 0;
 					tmw.localplayer.x = Math.floor(tmw.localplayer.x / 32) * 32 + 16;
 					tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;

@@ -146,42 +146,45 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	var frame, dir, left, top;
 	var frames = being.template.frames;
 	if (!frames) return;
-	if (!frames[being.action]) being.action = "stand";
-	if (!frames[being.action][being.direction]) being.direction = 1;
-	if (being.lastAction !== being.action ||
-		being.lastDirection !== being.direction) {
-			frame = frames[being.action][being.direction][0];
-			being.lastFrame = 0;
-			being.lastAction = being.action;
-			being.lastDirection = being.direction;
-			if (frame.delay)
-				being.nextFrame = frame.delay + timeAnimation;
-			else if (being.action === "dead")
-				being.nextFrame = 2000 + timeAnimation;
-			else
-				being.nextFrame = 0;
-	} else if (being.nextFrame && being.nextFrame <= timeAnimation) {
-		being.lastFrame += 1;
-		if (being.lastFrame >= frames[being.action][being.direction].length) {
+	if (!being.sprite) {
+		if (!frames[being.action]) being.action = "stand";
+		if (!frames[being.action][being.direction]) being.direction = 1;
+		being.sprite = frames[being.action][being.direction];
+		frame = being.sprite[0];
+		being.spriteIndex = 0;
+		if (frame.delay)
+			being.spriteTimer = frame.delay + timeAnimation;
+		else if (being.action === "dead")
+			being.spriteTimer = 3000 + timeAnimation;
+		else
+			being.spriteTimer = 0;
+	} else if (being.spriteTimer && being.spriteTimer <= timeAnimation) {
+		being.spriteIndex += 1;
+		if (being.spriteIndex >= being.sprite.length) {
 			if (being.type === "MONSTER" && being.action === "dead") {
 				delete tmw.beings[being.id];
 				return;
-			} else {
-				being.lastFrame %= frames[being.action][being.direction].length;
 			}
+			if (being.action.indexOf("attack") === 0) {
+				console.assert(!being.movePixelPath.length);
+				being.action = "stand";
+				if (!frames[being.action]) being.action = "stand";
+				if (!frames[being.action][being.direction]) being.direction = 1;
+				being.sprite = frames[being.action][being.direction];
+			}
+			being.spriteIndex = 0;
 		}
-		frame = frames[being.action][being.direction][being.lastFrame];
-		being.nextFrame = frame.delay + timeAnimation;
+		frame = being.sprite[being.spriteIndex];
+		being.spriteTimer = frame.delay + timeAnimation;
 	} else {
-		if (!being.lastFrame) being.lastFrame = 0;
-		frame = frames[being.action][being.direction][being.lastFrame];
+		frame = being.sprite[being.spriteIndex];
 	}
 	left = being.x - scrollX - Math.floor(frames.width / 2);
 	top = being.y - scrollY - frames.height + 16;
 	tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
 	if (being.type === "PLAYER") {
-		var visibleEquipment = ["shoes", "gloves", "bottomClothes", "topClothes",
-			"misc2", "hair", "hat", "weapon"];
+		var visibleEquipment = ["misc2", "shoes", "gloves", "bottomClothes",
+			"topClothes", "hair", "hat", "weapon"];
 		for (var slot in visibleEquipment) {
 			var equip = being.equipment[visibleEquipment[slot]];
 			if (!equip) continue;
@@ -205,7 +208,7 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 			if (!equip.frames[being.action][being.direction]) {
 				frame = equip.frames[being.action][1][0]
 			} else {
-				frame = equip.frames[being.action][being.direction][being.lastFrame];
+				frame = equip.frames[being.action][being.direction][being.spriteIndex];
 				if (!frame)
 					frame = equip.frames[being.action][being.direction][0];
 			}

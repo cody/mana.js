@@ -70,17 +70,18 @@ function createInput() {
 			tmw.selectedBeing.select("PLAYER");
 			break;
 		case 83: // s: sit
+			var action = tmw.localplayer.action;
+			if (action !== "stand" && action !== "sit") return;
 			if (!tmw.net.packetLimiter("CMSG_PLAYER_CHANGE_ACT")) return;
 			var msg = newOutgoingMessage("CMSG_PLAYER_CHANGE_ACT");
 			msg.write32(0);
-			var action;
-			switch (tmw.localplayer.action) {
-				case "walk": // Todo
+			switch (action) {
 				case "stand": msg.write8(2); tmw.localplayer.action = "sit"; break;
 				case "sit"  : msg.write8(3); tmw.localplayer.action = "stand"; break;
 				default: return;
 			}
 			msg.send();
+			tmw.localplayer.sprite = null;
 			break;
 		case 84: // t: talk
 			var being = tmw.selectedBeing.get();
@@ -136,8 +137,10 @@ function createInput() {
 		}
 		if (key.keyCode === 88) { // x: attack
 			attackKey = false;
-			if (tmw.localplayer.action === "attack")
+			if (tmw.localplayer.action.indexOf("attack") === 0) {
 				tmw.localplayer.action = "stand";
+				tmw.localplayer.sprite = null;
+			}
 		}
 	};
 }
@@ -175,9 +178,6 @@ function processMovementInput() {
 	}];
 	tmw.localplayer.xFloat = tmw.localplayer.x;
 	tmw.localplayer.yFloat = tmw.localplayer.y;
-	tmw.localplayer.action = "walk";
-	if (dy) tmw.localplayer.direction = arrow & 5;
-	else if (dx) tmw.localplayer.direction = arrow & 10;
 	var msg = newOutgoingMessage("CMSG_PLAYER_CHANGE_DEST");
 	msg.writeCoordinates(posX + dx, posY + dy);
 	msg.send();

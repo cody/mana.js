@@ -24,6 +24,7 @@ function createBeing(being) {
 	being.direction = 1;
 	being.equipment = {};
 	being.movePixelPath = [];
+	being.damageTaken = 0;
 	var job = being.job;
 	if (job <= 25 || (job >= 4001 && job <= 4049)) {
 		being.type = "PLAYER";
@@ -110,8 +111,10 @@ function processPlayerPacket(msg, msgType) {
 		} else {
 			being.x = coord.x * 32 + 16;
 			being.y = coord.y * 32 + 16;
+			being.movePixelPath.length = 0;
 		}
 		being.direction = coord.direction;
+		being.sprite = null;
 	}
 	being.gmStatus = msg.read16() ? true : false;
 	if (msgType === "SMSG_PLAYER_UPDATE_1")	{
@@ -122,7 +125,7 @@ function processPlayerPacket(msg, msgType) {
 			case 2: being.action = "sit"; break;
 			default: console.error("Ignoring action "+action+" for being "+id+" "+being.name);
 		}
-		being.movePixelPath.length = 0;
+		being.sprite = null;
 	} else if (msgType === "SMSG_PLAYER_MOVE") {
 		msg.skip(1);
 	}
@@ -148,6 +151,7 @@ tmw.handler.SMSG_BEING_REMOVE = function (msg) {
 	if (being.isSelected) tmw.selectedBeing.clear();
 	if (msg.read8() === 1 && being.type !== "NPC") {
 		being.action = "dead";
+		being.sprite = null;
 		being.movePixelPath.length = 0;
 	} else {
 		tmw.gui.social.removeBeingPresent(id);
@@ -211,7 +215,6 @@ function processBeingPacket(msg, msgType) {
 		}
 		if (!createBeing(being)) return;
 	}
-	if (msgType === "SMSG_BEING_VISIBLE") being.action = "stand";
 	being.hairStyle = msg.read16();
 	being.equipment.weapon = tmw.itemDB[msg.read16()];
 	being.equipment.bottomClothes = tmw.itemDB[msg.read16()];
@@ -232,13 +235,15 @@ function processBeingPacket(msg, msgType) {
 		var coord = msg.readCoordinatePair();
 		tmw.path.findPath(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
 	} else { // SMSG_BEING_VISIBLE
+		being.action = "stand";
 		var coord = msg.readCoordinate();
 		if (being.x) {
-			tmw.path.findPath(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
-				coord.x, coord.y);
+			tmw.path.findPath(being, Math.floor(being.x / 32),
+				Math.floor(being.y / 32), coord.x, coord.y);
 		} else {
 			being.x = coord.x * 32 + 16;
 			being.y = coord.y * 32 + 16;
+			being.sprite = null;
 		}
 		being.direction = coord.direction;
 	}
@@ -266,6 +271,7 @@ tmw.handler.SMSG_BEING_CHANGE_DIRECTION = function (msg) {
 		case 8: being.direction = 8; break;
 		case 9: being.direction = 1; break;
 	}
+	being.sprite = null;
 };
 
 tmw.handler.SMSG_PLAYER_GUILD_PARTY_INFO = function (msg) {
@@ -293,9 +299,19 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 	var type = msg.read8();
 	msg.skip(2); // param 3
 	switch (type) {
-		case 1: break; // pick-up
-		case 2: if (srcBeing) srcBeing.action = "sit"; break;
-		case 3: if (srcBeing) srcBeing.action = "stand"; break;
+		case 1: return; // pick-up
+		case 2: // sit
+			if (srcBeing) {
+				srcBeing.action = "sit";
+				srcBeing.sprite = null;
+			}
+			return;
+		case 3: // stand
+			if (srcBeing) {
+				srcBeing.action = "stand";
+				srcBeing.sprite = null;
+			}
+			return;
 		case 0x0: // HIT
 		case 0xa: // CRITICAL
 		case 0x8: // MULTI
@@ -314,6 +330,12 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 				being: dstBeing,
 				color: color
 			});
+			if (srcBeing && !srcBeing.movePixelPath.length &&
+				srcBeing.action.indexOf("attack") !== 0) {
+				srcBeing.action = srcBeing.equipment.weapon ?
+					srcBeing.equipment.weapon["attack-action"]: "attack";
+				srcBeing.sprite = null;
+			}
 			break;
 		case 0x4: // REFLECT
 			tmw.textParticle.push({
@@ -333,9 +355,18 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 			break;
 		default: console.error("Unknown SMSG_BEING_ACTION type " + type);
 	}
-	if (dstBeing) {
-		if (!dstBeing.damageTaken) dstBeing.damageTaken = 0;
-		dstBeing.damageTaken += damage;
+	if (!dstBeing) return;
+	dstBeing.damageTaken += damage;
+	if (!srcBeing) return;
+	var dx = Math.abs(Math.floor(dstBeing.x / 32) - Math.floor(srcBeing.x / 32));
+	var dy = Math.abs(Math.floor(dstBeing.y / 32) - Math.floor(srcBeing.y / 32));
+	if (dy && dy >= dx)
+		var dir = (dstBeing.y - srcBeing.y) > 0 ? 1 : 4;
+	else if (dx)
+		dir = (dstBeing.x - srcBeing.x) > 0 ? 8 : 2;
+	if ((dx || dy) && srcBeing.direction !== dir) {
+		srcBeing.direction = dir;
+		srcBeing.sprite = null;
 	}
 };
 
@@ -354,6 +385,7 @@ tmw.handler.SMSG_PLAYER_STOP = function (msg) {
 	if (being.movePixelPath.length) {
 		being.movePixelPath.length = 0;
 		being.action = "stand";
+		being.sprite = null;
 	}
 };
 
@@ -361,5 +393,8 @@ tmw.handler.SMSG_BEING_RESURRECT = function (msg) {
 	var id = msg.read32();
 	var being = (id === tmw.localplayer.id) ? tmw.localplayer : tmw.beings[id];
 	if (!being) return;
-	if (msg.read8() === 1) being.action = "stand";
+	if (msg.read8() === 1) {
+		being.action = "stand";
+		being.sprite = null;
+	}
 };

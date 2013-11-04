@@ -128,6 +128,7 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_1  = function (msg) {
 			tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
 		}
 		tmw.localplayer.action = "dead";
+		tmw.localplayer.sprite = null;
 		tmw.selectedBeing.clear();
 		$("<div>").html("You have died!")
 			.attr("title", "Death Notice")
@@ -243,6 +244,7 @@ function playerChangeDirection(dir) {
 	msg.write8(dir);
 	msg.send();
 	tmw.localplayer.direction = dir;
+	tmw.localplayer.sprite = null;
 }
 
 function playerPickUp() {

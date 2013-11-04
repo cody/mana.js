@@ -46,17 +46,23 @@ function createLoop() {
 		var deltaTime = timeAnimation - tmw.timeAnimation;
 		tmw.timeAnimation = timeAnimation;
 
-		console.assert(tmw.map.width);
-
 		if (tmw.localplayer.action !== "dead" && !tmw.gui.npc.isOpen()) {
 			if (!tmw.localplayer.movePixelPath.length) {
 				processMovementInput();
+				if (tmw.localplayer.movePixelPath.length) {
+					tmw.localplayer.action = "walk";
+					tmw.localplayer.sprite = null;
+				}
 			}
 			if (tmw.localplayer.movePixelPath.length) {
 				var pixelsMoved = (32 / tmw.localplayer.moveSpeed) * deltaTime;
 				move(tmw.localplayer, pixelsMoved);
 				if (!tmw.localplayer.movePixelPath.length) {
 					processMovementInput();
+					if (!tmw.localplayer.movePixelPath.length) {
+						tmw.localplayer.action = "stand";
+						tmw.localplayer.sprite = null;
+					}
 				}
 			} else if (tmw.input.getAttackKey()) {
 				if (!tmw.selectedBeing.get())
@@ -64,11 +70,27 @@ function createLoop() {
 				var selected = tmw.selectedBeing.get();
 				if (selected && selected.type !== "NPC") {
 					if (tmw.net.packetLimiter("CMSG_PLAYER_ATTACK")) {
-						tmw.localplayer.action = "attack";
+						if (tmw.localplayer.action.indexOf("attack") !== 0) {
+							tmw.localplayer.action =
+								tmw.localplayer.equipment.weapon ?
+								tmw.localplayer.equipment.weapon["attack-action"]:
+								"attack";
+							tmw.localplayer.sprite = null;
+						}
 						var msg = newOutgoingMessage("CMSG_PLAYER_ATTACK");
 						msg.write32(selected.id);
 						msg.write8(0);
 						msg.send();
+						var dx = Math.abs(Math.floor(selected.x / 32) -
+							Math.floor(tmw.localplayer.x / 32));
+						var dy = Math.abs(Math.floor(selected.y / 32) -
+							Math.floor(tmw.localplayer.y / 32));
+						if (dy && dy >= dx)
+							var dir = (selected.y - tmw.localplayer.y) > 0 ? 1 : 4;
+						else if (dx)
+							dir = (selected.x - tmw.localplayer.x) > 0 ? 8 : 2;
+						if (dx || dy)
+							playerChangeDirection(dir);
 					}
 				}
 			}
@@ -132,10 +154,13 @@ function createLoop() {
 
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
-
 			if (being.movePixelPath.length) {
 				var pixelsMoved = (32 / being.moveSpeed) * deltaTime;
 				move(being, pixelsMoved);
+				if (!being.movePixelPath.length) {
+					being.action = "stand";
+					being.sprite = null;
+				}
 			}
 
 			if (being.isSelected)
@@ -196,11 +221,15 @@ function createLoop() {
 			var dstY = being.movePixelPath[0].dstY;
 			var dx = dstX - being.xFloat;
 			var dy = dstY - being.yFloat;
-			console.assert(dx || dy);if(!(dx || dy))debugger;
-			being.direction =
+			console.assert(dx || dy);
+			var dir =
 				dy > 0 ? 1 :
 				dy < 0 ? 4 :
 				dx > 0 ? 8 : 2;
+			if (being.direction !== dir) {
+				being.direction = dir;
+				being.sprite = null;
+			}
 			var remainderX = 0;
 			if (dx) {
 				remainderX = Math.abs(dx) - pixelsMoved;
@@ -229,10 +258,8 @@ function createLoop() {
 			}
 			if (doShift) {
 				being.movePixelPath.shift();
-				if (!being.movePixelPath.length) {
-					being.action = "stand";
+				if (!being.movePixelPath.length)
 					doLoop = false;
-				}
 			}
 			if (doLoop) {
 				pixelsMoved = -Math.min(remainderX, remainderY);

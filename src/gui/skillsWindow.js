@@ -110,7 +110,6 @@ function createSkillsWindow() {
 		table += "</table>"
 		$(content).html(table);
 		$(".skillUpButton").click( function (event) {
-			console.log(Number(event.target.attributes.skillid.value));
 			var msg = newOutgoingMessage("CMSG_SKILL_LEVELUP_REQUEST");
 			msg.write16(Number(event.target.attributes.skillid.value));
 			msg.send();
