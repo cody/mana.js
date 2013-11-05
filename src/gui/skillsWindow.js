@@ -107,6 +107,9 @@ function createSkillsWindow() {
 			}
 			table += "</tr>";
 		}
+		if (table === "<table>")
+			table += "<div style='padding-left:5px'>You have not learned any " +
+				tab + " skills yet.</div>"
 		table += "</table>"
 		$(content).html(table);
 		$(".skillUpButton").click( function (event) {
