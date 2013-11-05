@@ -36,9 +36,9 @@ tmw.handler.SMSG_NPC_NEXT = function (msg) {
 };
 
 tmw.handler.SMSG_NPC_CHOICE = function (msg) {
-	msg.skip(4); // npc id
+	var id = msg.read32();
 	var text = htmlToText(msg.readString());
-	tmw.gui.npc.choice(text);
+	tmw.gui.npc.choice(id, text);
 };
 
 tmw.handler.SMSG_NPC_INT_INPUT = function (msg) {

@@ -3,7 +3,7 @@
 	"name": "The Mana World",
 	"short_name": "Mana.js",
 	"description": "A free open source 2d MMORP Game",
-	"version": "2013.11.4",
+	"version": "2013.11.5",
 	"app": {
 		"background": {
 			"scripts": ["background.js"]
