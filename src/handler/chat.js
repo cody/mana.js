@@ -62,7 +62,8 @@ tmw.handler.SMSG_WHISPER = function (msg) {
 	var nick = msg.readString(24);
 	var text = msg.readString();
 	text = tmw.gui.chat.parse(text);
-	tmw.gui.chat.log(nick, text, "wisper");
+	if (text.indexOf("!selllist ") !== 0 && text.indexOf("!buylist ") !== 0)
+		tmw.gui.chat.log(nick, text, "wisper");
 };
 
 tmw.handler.SMSG_WHISPER_RESPONSE = function (msg) {
