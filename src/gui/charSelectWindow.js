@@ -249,6 +249,7 @@ function createCharSelectWindow() {
 		tmw.context.clearRect(0, 0, 96, 96);
 		if (timeAnimation > rotateNextTime) {
 			rotateNextTime = timeAnimation + 1000;
+			blankChar.sprite = null;
 			if (blankChar.direction === 8)
 				blankChar.direction = 1;
 			else
