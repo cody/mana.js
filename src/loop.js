@@ -94,6 +94,8 @@ function createLoop() {
 					}
 				}
 			}
+			if (tmw.pickUpQueue.length)
+				itemPickUp();
 		}
 
 		if (tmw.config.showFps) {

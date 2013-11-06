@@ -129,6 +129,7 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_1  = function (msg) {
 		}
 		tmw.localplayer.action = "dead";
 		tmw.localplayer.sprite = null;
+		tmw.pickUpQueue.length = 0;
 		tmw.selectedBeing.clear();
 		$("<div>").html("You have died!")
 			.attr("title", "Death Notice")
@@ -247,20 +248,37 @@ function playerChangeDirection(dir) {
 	tmw.localplayer.sprite = null;
 }
 
-function playerPickUp() {
-	var dx, dy, floor;
+function buildPickUpQueue() {
+	if (tmw.pickUpQueue.length) return;
+	var playerX = Math.floor(tmw.localplayer.x / 32);
+	var playerY = Math.floor(tmw.localplayer.y / 32);
 	for (var f in tmw.floorItems) {
-		floor = tmw.floorItems[f];
-		dx = Math.abs(Math.floor(tmw.localplayer.x / 32) - floor.x / 32);
-		dy = Math.abs(Math.floor(tmw.localplayer.y / 32) - floor.y / 32);
-		if (dx <= 1 && dy <= 1) break;
-		floor = null;
+		var floor = tmw.floorItems[f];
+		var dx = Math.abs(floor.x / 32 - playerX);
+		var dy = Math.abs(floor.y / 32 - playerY);
+		if (dx <= 1 && dy <= 1)
+			tmw.pickUpQueue.push(floor);
 	}
-	if (!floor) return;
+	if (tmw.pickUpQueue.length)
+		itemPickUp();
+}
+
+function itemPickUp() {
 	if (!tmw.net.packetLimiter("CMSG_ITEM_PICKUP")) return;
-	var msg = newOutgoingMessage("CMSG_ITEM_PICKUP");
-	msg.write32(floor.id);
-	msg.send();
+	var playerX = Math.floor(tmw.localplayer.x / 32);
+	var playerY = Math.floor(tmw.localplayer.y / 32);
+	while (tmw.pickUpQueue.length) {
+		var floor = tmw.pickUpQueue.pop();
+		if (!tmw.floorItems[floor.id]) continue;
+		var dx = Math.abs(floor.x / 32 - playerX);
+		var dy = Math.abs(floor.y / 32 - playerY);
+		if (dx <= 1 && dy <= 1) {
+			var msg = newOutgoingMessage("CMSG_ITEM_PICKUP");
+			msg.write32(floor.id);
+			msg.send();
+			return;
+		}
+	};
 }
 
 function StateNumberToString(type) {

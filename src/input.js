@@ -100,7 +100,7 @@ function createInput() {
 			break;
 		case 89:
 		case 90: // y or z: pick-up
-			playerPickUp();
+			buildPickUpQueue();
 			break;
 		case 113: // F2: status window
 			tmw.gui.status.toggle();

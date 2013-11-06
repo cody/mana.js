@@ -30,6 +30,7 @@ var tmw = {
 	handler: {},
 	inventory: [],
 	packetsReverse: {},
+	pickUpQueue: [],
 	playerSet: {},
 	textParticle: [],
 	tilesets: {},

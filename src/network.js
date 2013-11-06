@@ -180,7 +180,7 @@ function createNetwork() {
 	}
 
 	var limiterTable = {
-		"CMSG_ITEM_PICKUP": {rate: 400, nextTime: 0},
+		"CMSG_ITEM_PICKUP": {rate: 450, nextTime: 0},
 		"CMSG_PLAYER_ATTACK": {rate: 1000, nextTime: 0},
 		"CMSG_PLAYER_CHANGE_ACT": {rate: 1000, nextTime: 0},
 		"CMSG_PLAYER_INVENTORY_DROP": {rate: 50, nextTime: 0},

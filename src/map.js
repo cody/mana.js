@@ -22,6 +22,7 @@
 function cleanOutMap() {
 	tmw.beings = {};
 	tmw.floorItems = {};
+	tmw.pickUpQueue.length = 0;
 	tmw.gui.social.resetBeingPresent();
 	tmw.gui.shop.close();
 	tmw.localplayer.action = "stand";
