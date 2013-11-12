@@ -31,8 +31,8 @@ tmw.handler.SMSG_SERVER_VERSION_RESPONSE = function () {
 	*/
 	var msg = newOutgoingMessage("CMSG_LOGIN_REQUEST");
 	msg.write32(0); // Client Version
-	msg.writeString(tmw.net.getLoginName(), 24);
-	msg.writeString(tmw.net.getPassword(), 24);
+	msg.writeString(tmw.net.loginData.name, 24);
+	msg.writeString(tmw.net.loginData.password, 24);
 	msg.write8(3); // Bitmask 0x01: Can handle Update Host packet
 				   //         0x02: defaults to first char-server instead of last 
 	msg.send();
@@ -44,7 +44,7 @@ tmw.handler.SMSG_UPDATE_HOST = function (msg) {
 };
 
 tmw.handler.SMSG_LOGIN_DATA = function (msg) {
-	console.log("SMSG_LOGIN_DATA");
+	tmw.net.worlds.length = 0;
 	var worldCount = (msg.getSize() - 43) / 32;
 	console.log("Got " + worldCount + " worlds.");
 	tmw.net.token.sessionId1 = msg.read32();
@@ -59,7 +59,7 @@ tmw.handler.SMSG_LOGIN_DATA = function (msg) {
 		var name = msg.readString(20);
 		var onlineUsers = msg.read32();
 		msg.skip(2);
-		tmw.net.getWorlds().push({server: ip, port: port, name: name, onlineUsers: onlineUsers});
+		tmw.net.worlds.push({server: ip, port: port, name: name, onlineUsers: onlineUsers});
 		console.log("World: ip: "+ip+", port: "+port+", name: "+name+", user: "+onlineUsers);
 	}
     tmw.state.set("STATE_UPDATE");
@@ -70,7 +70,7 @@ tmw.handler.SMSG_LOGIN_ERROR = function(msg) {
 	var text;
 	switch (code) {
 		case 0:
-			text = "There is no user with the name " + tmw.net.getLoginName() +
+			text = "There is no user with the name " + tmw.net.loginData.name +
 				" registered.";
 			break;
 		case 1:

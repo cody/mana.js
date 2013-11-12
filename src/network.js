@@ -26,19 +26,15 @@ function createNetwork() {
 		write: write,
 		connect: connect,
 		disconnect: disconnect,
-		setLoginData: function (n, p) { name = n; password = p; },
-		getLoginName: function () { return name; },
-		getPassword: function () { return password; },
+		loginData: {},
+		worlds: [],
+		updateHost: null,
 		setUpdateHost: setUpdateHost,
-		getUpdateHost: function () { return updatehost; },
-		getWorlds: function () { return worlds; },
 		packetLimiter: packetLimiter,
 		fatalError: fatalError,
 	};
 
 	var socketId = null;
-	var name, password, updatehost;
-	var worlds = [];
 	var skip4Bytes = false;
 	var overlappingMessage = null;
 	var overlappingMessageBegin;
@@ -91,11 +87,11 @@ function createNetwork() {
 	}
 
 	function setUpdateHost(update) {
-		updatehost = update;
-		if (updatehost[updatehost.length-1] === "/") {
-			updatehost = updatehost.slice(0, -1);
-		}
-		console.log("Update-host: " + updatehost);
+		if (update[update.length-1] === "/")
+			tmw.net.updateHost = update.slice(0, -1);
+		else
+			tmw.net.updateHost = update;
+		console.log("Update-host: " + tmw.net.updateHost);
 	}
 
 	function dispatchMessages(readInfo) {

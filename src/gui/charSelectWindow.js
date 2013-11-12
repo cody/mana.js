@@ -53,13 +53,14 @@ function createCharSelectWindow() {
 	wallpaper.html(win);
 
 	function drawChoices() {
-		if (tmw.secret) {
+		if (tmw.net.loginData.character) {
 			for (var i in choices) {
-				if (tmw.secret.character === choices[i].name) {
+				if (tmw.net.loginData.character === choices[i].name) {
 					tmw.localplayer = choices[i];
 					var msg = newOutgoingMessage("CMSG_CHAR_SELECT");
 					msg.write8(choices[i].slot);
 					msg.send();
+					tmw.net.loginData.character = "";
 					return;
 				}
 			}

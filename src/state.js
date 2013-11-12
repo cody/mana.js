@@ -29,11 +29,7 @@ tmw.state = {
 };
 
 tmw.state.STATE_START = function () {
-	console.error("Clean up!"); // Todo
-	tmw.state.set("STATE_LOGIN");
-}
-
-tmw.state.STATE_LOGIN = function () {
+	console.warn("Clean up!"); // Todo
 	$("body").html("<div id='wallpaper'></div>")
 	$("#wallpaper")
 		.css("position", "absolute")
@@ -43,55 +39,12 @@ tmw.state.STATE_LOGIN = function () {
 		.css("width", "100%")
 		.css("background", "url(graphics/spit23loginwallpaper_800x600.png)")
 		.css("background-size", "100% 100%")
-		.css("background-repeat", "no-repeat")
-		.html(
-			"<form id='loginForm' title='Login'>" +
-			"<a id='signUpLink' href='http://www.themanaworld.org/registration.php' target='_blank'>Sign-up</a><br>" +
-			"<label for='formName'>Name</label>" +
-			"<input type='text' id='formName' class='ui-widget-content ui-corner-all'>" +
-			"<label for='formPassword'>Password</label>" +
-			"<input type='password' id='formPassword' class='ui-widget-content ui-corner-all'>" +
-			"<button id='connectButton'>Play</button>" +
-			"</form>" +
-			"<div id='loginVersion'></div>");
-	$("#loginForm>input")
-		.css("display", "block")
-		.css("width", "95%")
-		.css("margin-bottom", ".5em");
-	$("#loginForm>a")
-		.css("font-weight", "bold")
-		.css("float", "right")
-		.css("text-decoration", "none")
-		.css("color", "green")
-		.css("font-family", "monospace")
-		.css("font-size", "12pt");
-	$("#connectButton").button();
-	$("#connectButton")
-		.css("color", "Brown")
-		.click(function (event) {
-			event.preventDefault();
-			var server = tmw.secret ? tmw.secret.server : "server.themanaworld.org";
-			var name = document.getElementById("formName").value;
-			var password = document.getElementById("formPassword").value;
-			$("#loginForm").dialog("close");
-			console.log("Server: " + server + ", Name: " + name);
-			tmw.net.setLoginData(name, password);
-			tmw.state.set("STATE_LOGIN_ATTEMPT", {server: server, port: 6901});});
-	$("#loginVersion")
-		.css("position", "absolute")
-		.css("bottom", 0)
-		.css("right", 0)
-		.text("Version: " + chrome.runtime.getManifest().version);
-	if (tmw.secret) {
-		$("#formName").attr("value", tmw.secret.name);
-		$("#formPassword").attr("value", tmw.secret.password);
-	}
-	if ($("#formName").attr("value")) {
-		$("#formPassword").attr("autofocus", "true");
-	} else {
-		$("#formName").attr("autofocus", "true");
-	}
-	$("#loginForm").dialog({width: 280, dialogClass: "no-close"});
+		.css("background-repeat", "no-repeat");
+	tmw.state.set("STATE_LOGIN");
+}
+
+tmw.state.STATE_LOGIN = function () {
+	stateLogin();
 };
 
 tmw.state.STATE_LOGIN_ATTEMPT = function (loginData) {
@@ -118,12 +71,12 @@ tmw.state.STATE_LOGIN_ERROR = function (text) {
 };
 
 tmw.state.STATE_WORLD_SELECT = function () {
-	//if (tmw.net.getWorlds().length === 1)
+	//if (tmw.net.worlds.length === 1)
 	tmw.state.set("STATE_WORLD_SELECT_ATTEMPT", 0);
 };
 
 tmw.state.STATE_WORLD_SELECT_ATTEMPT = function (index) {
-	tmw.net.connect(tmw.net.getWorlds()[index], function () {
+	tmw.net.connect(tmw.net.worlds[index], function () {
 		tmw.state.set("STATE_GET_CHARACTERS");
 	});
 };

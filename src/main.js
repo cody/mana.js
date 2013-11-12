@@ -62,7 +62,7 @@ function main() {
 		if (tmw.handler[p]) tmw.callHandler[tmw.packets[p]] = tmw.handler[p];
 	}
 
-	tmw.state.set("STATE_LOGIN");
+	tmw.state.set("STATE_START");
 }
 
 // utils

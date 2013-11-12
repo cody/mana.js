@@ -37,7 +37,7 @@ tmw.state.STATE_UPDATE = function () {
 			
 		// Download remote xml
 		tmw.gui.update.setText("Loading remote resources.xml");
-		http.open("GET", tmw.net.getUpdateHost() + "/resources.xml?" + Date.now(), true);
+		http.open("GET", tmw.net.updateHost + "/resources.xml?" + Date.now(), true);
 		http.onloadend = onRemoteResources;
 		http.send(null);
 	}
@@ -144,7 +144,7 @@ tmw.state.STATE_UPDATE = function () {
 	}
 	
 	function downloadRemoteZip() {
-		var z = tmw.net.getUpdateHost() + "/" + zipname;
+		var z = tmw.net.updateHost + "/" + zipname;
 		http = new XMLHttpRequest();
 		http.open("GET", z, true);
 		http.responseType = "arraybuffer";
