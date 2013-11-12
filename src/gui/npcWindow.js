@@ -73,7 +73,8 @@ function createNPCWindow() {
 			tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
 		}
 		win.toggle();
-		$("#npcWindowName").text(tmw.beings[id].name ? tmw.beings[id].name : "NPC");
+		$("#npcWindowName").text(tmw.beings[id] && tmw.beings[id].name ?
+			tmw.beings[id].name : "NPC");
 		scroll.css("top", $("#npcWindowTitle").height());
 	}
 
