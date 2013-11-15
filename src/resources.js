@@ -148,7 +148,8 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	if (!frames) return;
 	if (!being.sprite) {
 		if (!frames[being.action]) being.action = "stand";
-		if (!frames[being.action][being.direction]) being.direction = 1;
+		if (!frames[being.action][being.direction])
+			being.direction = Object.keys(frames[being.action])[0];
 		being.sprite = frames[being.action][being.direction];
 		frame = being.sprite[0];
 		being.spriteIndex = 0;
