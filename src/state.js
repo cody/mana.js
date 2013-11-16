@@ -48,9 +48,14 @@ tmw.state.STATE_LOGIN = function () {
 };
 
 tmw.state.STATE_LOGIN_ATTEMPT = function (loginData) {
-	tmw.net.connect(loginData, function () {
-		newOutgoingMessage("CMSG_SERVER_VERSION_REQUEST").send();
-		tmw.net.read();
+	tmw.net.connect(loginData, false, function () {
+		var msg = newOutgoingMessage("CMSG_LOGIN_REQUEST");
+		msg.write32(0); // Client Version
+		msg.writeString(tmw.net.loginData.name, 24);
+		msg.writeString(tmw.net.loginData.password, 24);
+		msg.write8(3); // Bitmask 0x01: Can handle Update Host packet
+					   //         0x02: defaults to first char-server instead of last
+		msg.send();
 	});
 	tmw.gui.update = showUpdateDialog();
 };
@@ -76,7 +81,7 @@ tmw.state.STATE_WORLD_SELECT = function () {
 };
 
 tmw.state.STATE_WORLD_SELECT_ATTEMPT = function (index) {
-	tmw.net.connect(tmw.net.worlds[index], function () {
+	tmw.net.connect(tmw.net.worlds[index], true, function () {
 		tmw.state.set("STATE_GET_CHARACTERS");
 	});
 };
@@ -90,7 +95,6 @@ tmw.state.STATE_GET_CHARACTERS = function () {
     msg.write8(tmw.net.token.sex);
 	msg.send();
 	createCharSelectWindow();
-	tmw.net.read(true);
 };
 
 tmw.state.STATE_CHAR_SELECT = function () {
@@ -106,7 +110,6 @@ tmw.state.STATE_CONNECT_GAME = function () {
 	msg.write32(tmw.net.token.sessionId2);
 	msg.write8(tmw.net.token.sex);
 	msg.send();
-	tmw.net.read(true);
 };
 
 tmw.state.STATE_GAME = function () {

@@ -20,13 +20,22 @@
 "use strict";
 
 function stateLogin() {
+	tmw.gui.login = {
+		registrationEnabled: registrationEnabled,
+	};
+
 	var serverList = {
 		"server.themanaworld.org:6901": {
 			name: "The Mana World",
 			hostname: "server.themanaworld.org",
-			port: 6901},
-		"caliban.homeip.net:6901": {
+			port: 6901,
+			signUp: "http://www.themanaworld.org/registration.php"},
+		"testing.themanaworld.org:6902": {
 			name: "Testing Server",
+			hostname: "testing.themanaworld.org",
+			port: 6902},
+		"caliban.homeip.net:6901": {
+			name: "The Testing World",
 			hostname: "caliban.homeip.net",
 			port: 6901},
 		"127.0.0.1:6901": {
@@ -52,7 +61,8 @@ function stateLogin() {
 
 	$("#wallpaper").html(
 		"<form id='loginForm'>" +
-		"<a id='signUpLink' href='http://www.themanaworld.org/registration.php' target='_blank'>Sign-up</a><br>" +
+		"<div id='signUp' style='float:right; font-weight:bold;" +
+		"font-family:monospace;'></div><br>" +
 		"<label for='formName'>Name</label>" +
 		"<input type='text' id='formName' class='ui-widget-content ui-corner-all'>" +
 		"<label for='formPassword'>Password</label>" +
@@ -64,13 +74,6 @@ function stateLogin() {
 		.css("display", "block")
 		.css("width", "95%")
 		.css("margin-bottom", ".5em");
-	$("#loginForm>a")
-		.css("font-weight", "bold")
-		.css("float", "right")
-		.css("text-decoration", "none")
-		.css("color", "green")
-		.css("font-family", "monospace")
-		.css("font-size", "12pt");
 	$("#connectButton")
 		.css("color", "Brown")
 		.click(function (event) {
@@ -137,6 +140,7 @@ function stateLogin() {
 		var titel = serverList[serverListIndex].name === "The Mana World" ?
 			"Login" : "Login (" + serverList[serverListIndex].name + ")";
 		$("#loginForm").dialog("option", "title", titel);
+		document.getElementById("signUp").innerHTML = "";
 		$("#formName").attr("value", serverList[serverListIndex].account);
 		$("#formPassword").attr("value", serverList[serverListIndex].password);
 		if (!serverList[serverListIndex].account)
@@ -145,6 +149,38 @@ function stateLogin() {
 			document.getElementById("formPassword").focus();
 		else
 			document.getElementById("connectButton").focus();
+		tmw.net.connect({server: serverList[serverListIndex].hostname,
+			port: serverList[serverListIndex].port}, false,
+			function () {
+				newOutgoingMessage("CMSG_SERVER_VERSION_REQUEST").send();
+			},
+			function (result) {
+				document.getElementById("signUp").innerHTML =
+					"<span style='color:Red'>" + result + "</span>";
+			});
+	}
+
+	function registrationEnabled(isEnabled) {
+		var div = document.getElementById("signUp");
+		if (!div) return;
+		var link = document.createElement("a");
+		link.style.fontSize = "12pt";
+		link.style.color = "Green";
+		link.style.textDecoration = "none";
+		if (isEnabled) {
+			link.innerText = "Register";
+			link.onclick = openSignUpWindow;
+			div.appendChild(link);
+		} else {
+			if (serverList[serverListIndex].signUp) {
+				link.href = serverList[serverListIndex].signUp;
+				link.target = "_blank";
+				link.innerText = "Sign-up";
+				div.appendChild(link);
+			} else {
+				div.innerHTML = "<span style='color:Blue'>Registration disabled</span>";
+			}
+		}
 	}
 
 	function openLoginSettingsWindow() {
@@ -154,7 +190,6 @@ function stateLogin() {
 			.css("position", "absolute")
 			.css("top", 0)
 			.css("right", 0)
-			.css("z-index", 1000)
 			.css("background", "Bisque")
 			.css("font-size", "12pt")
 			.appendTo("#wallpaper")
@@ -220,6 +255,68 @@ function stateLogin() {
 		objectStore.put(serverListIndex, "index");
 		$("#loginForm").dialog("open");
 		fillInLoginData();
+	}
+
+	function openSignUpWindow() {
+		$("#loginForm").dialog("close");
+		var sex = "_M";
+		var div = document.createElement("div");
+		document.getElementById("wallpaper").appendChild(div);
+		div.style.background = "Bisque";
+		div.style.position = "absolute";
+		div.innerHTML = "<div style='background:DeepSkyBlue'>" +
+			"<span style='margin:4px;'>Register at " +
+			serverList[serverListIndex].name + "</span></div>" +
+			"<table><tr><td>Name:</td><td><input id='name'></td></tr>" +
+			"<tr><td>Password:</td><td><input type='password' id='password'></td></tr>" +
+			"<tr><td>Confirm:</td><td><input type='password' id='confirm'></td></tr>" +
+			"<tr><td></td><td><form><label><input type='radio' id='male' name='sex' checked>Male</input></label>" +
+			"<label><input type='radio' id='female' name='sex'>Female</input></label></form></td>" +
+			"<tr><td></td><td><span style='float:right'>" +
+			"<button id='cancel'>Cancel</button>" +
+			"<button id='register'>Register</button>" +
+			"</span></td></tr></table>";
+		var rect = div.getBoundingClientRect();
+		div.style.left = Math.floor((window.innerWidth - rect.width) / 2) + "px";
+		div.style.top = Math.floor((window.innerHeight - rect.height) / 2) + "px";
+		document.getElementById("male").onchange = function () { sex = "_M"; };
+		document.getElementById("female").onchange = function () { sex = "_F"; };
+		document.getElementById("cancel").onclick = function () {
+			div.parentNode.removeChild(div);
+			$("#loginForm").dialog("open");
+		};
+		document.getElementById("register").onclick = function () {
+			var host = serverList[serverListIndex].hostname;
+			var port = serverList[serverListIndex].port;
+			var name = document.getElementById("name").value.trim();
+			var password = document.getElementById("password").value.trim();
+			var confirm = document.getElementById("confirm").value.trim();
+			var error = null;
+			if (name.length < 4)
+				error = "The username needs to be at least 4 characters long.";
+			else if (name.length > 21)
+				error = "The username needs to be less than 22 characters long.";
+			else if (password.length < 4)
+				error = "The password needs to be at least 4 characters long.";
+			else if (password.length > 23)
+				error = "The password needs to be less than 24 characters long.";
+			else if (password !== confirm)
+				error = "Passwords do not match.";
+			if (error) {
+				$("<div>")
+					.html(error)
+					.attr("title", "Error")
+					.dialog({
+						dialogClass: "no-close",
+						buttons: { OK: function() { $(this).dialog("close"); }}
+					});
+			} else {
+				name += sex;
+				console.log("Register account: " + name);
+				tmw.net.loginData = {name: name, password: password};
+				tmw.state.set("STATE_LOGIN_ATTEMPT", {server: host, port: port});
+			}
+		};
 	}
 
 	function dbError(event) {

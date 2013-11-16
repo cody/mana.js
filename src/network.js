@@ -22,7 +22,6 @@
 function createNetwork() {
 	tmw.net = {
 		token: {},
-		read: read,
 		write: write,
 		connect: connect,
 		disconnect: disconnect,
@@ -38,11 +37,8 @@ function createNetwork() {
 	var skip4Bytes = false;
 	var overlappingMessage = null;
 	var overlappingMessageBegin;
-
-	function read(skip) {
-		if (skip) skip4Bytes = true;
-		chrome.socket.read(socketId, null, dispatchMessages);
-	}
+	var hostName;
+	var port;
 
 	function write(arraybuffer) {
 		if (!socketId) {
@@ -56,8 +52,18 @@ function createNetwork() {
 		});
 	}
 
-	function connect(o, callback) {
-		if (socketId) tmw.net.disconnect();
+	function connect(o, skip, success, failure) {
+		if (socketId) {
+			if (hostName === o.server && port === o.port) {
+				console.log("Network: Reusing socketId " + socketId);
+				success();
+				return;
+			} else {
+				tmw.net.disconnect();
+			}
+		}
+		hostName = o.server;
+		port = o.port;
 		chrome.socket.create('tcp', {}, function(createInfo) {
 			socketId = Number(createInfo.socketId);
 			chrome.runtime.getBackgroundPage(function(backgroundPage){
@@ -67,13 +73,20 @@ function createNetwork() {
 			chrome.socket.connect(socketId, o.server, o.port, function (result) {
 				if (result < 0) {
 					console.error("Network connect error");
-					fatalError("Network connect error", result);
+					if (failure) {
+						disconnect();
+						failure(errorCodes[result]);
+					} else {
+						fatalError("Network connect error", result);
+					}
 					return;
 				}
 				chrome.socket.setNoDelay(socketId, true, function (noDelayResult) {
 					if (!noDelayResult) console.error("setNoDelay failed");
 				});
-				callback();
+				skip4Bytes = skip;
+				chrome.socket.read(socketId, null, dispatchMessages);
+				success();
 			});
 		});
 	}

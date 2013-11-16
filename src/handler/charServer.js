@@ -113,7 +113,7 @@ tmw.handler.SMSG_CHAR_MAP_INFO = function (msg) {
 	tmw.net.token.map = msg.readString(16, true);
 	var hostname = ip2String(msg.read32());
 	var port = msg.read16();
-	tmw.net.connect({server: hostname, port: port}, function () {
+	tmw.net.connect({server: hostname, port: port}, true, function () {
 		tmw.state.set("STATE_CONNECT_GAME");
 	});
 };

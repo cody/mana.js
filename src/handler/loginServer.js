@@ -19,23 +19,16 @@
 
 "use strict";
 
-tmw.handler.SMSG_SERVER_VERSION_RESPONSE = function () {
-	/* message length = 10
-	 * Offset 2: major (255)
-	 * Offset 3: minor ('T')
-	 * Offset 4: revision ('M')
-	 * Offset 5: release ('W')
-	 * Offset 6: official (0 = client registation disabled, 1 = enabled)
-	 * Offset 7: which
-	 * Offset 8-9: mod version
-	*/
-	var msg = newOutgoingMessage("CMSG_LOGIN_REQUEST");
-	msg.write32(0); // Client Version
-	msg.writeString(tmw.net.loginData.name, 24);
-	msg.writeString(tmw.net.loginData.password, 24);
-	msg.write8(3); // Bitmask 0x01: Can handle Update Host packet
-				   //         0x02: defaults to first char-server instead of last 
-	msg.send();
+tmw.handler.SMSG_SERVER_VERSION_RESPONSE = function (msg) {
+	msg.skip(1); // major (255)
+	msg.skip(1); // minor ('T')
+	msg.skip(1); // revision ('M')
+	msg.skip(1); // release ('W')
+	var official = msg.read8(); // 0 = registation disabled, 1 = enabled
+	console.log("Registration: " + (official ? "enabled" : "disabled"));
+	tmw.gui.login.registrationEnabled(official);
+	// msg.skip(1); // which
+	// msg.skip(2); // mod version
 };
 
 tmw.handler.SMSG_UPDATE_HOST = function (msg) {
