@@ -19,7 +19,7 @@
 
 "use strict";
 
-tmw.state.STATE_UPDATE = function () {
+function stateUpdate() {
 	var resources = [];
 	var http = new XMLHttpRequest();
 	var filesystem;

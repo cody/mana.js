@@ -19,7 +19,7 @@
 
 "use strict";
 
-tmw.state.STATE_LOAD_DATA = function () {
+function stateLoadData() {
 	loadXmlFromZip("effects.xml", readEffectsXml);
 	loadXmlFromZip("emotes.xml", readEmotesXml);
 	loadXmlFromZip("hair.xml", readHairXml);

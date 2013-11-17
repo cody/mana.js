@@ -75,6 +75,14 @@ tmw.state.STATE_LOGIN_ERROR = function (text) {
 		}});
 };
 
+tmw.state.STATE_UPDATE = function () {
+	stateUpdate();
+};
+
+tmw.state.STATE_LOAD_DATA = function () {
+	stateLoadData();
+};
+
 tmw.state.STATE_WORLD_SELECT = function () {
 	//if (tmw.net.worlds.length === 1)
 	tmw.state.set("STATE_WORLD_SELECT_ATTEMPT", 0);
