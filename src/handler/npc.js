@@ -61,27 +61,31 @@ tmw.handler.SMSG_NPC_BUY_SELL_CHOICE = function (msg) {
 };
 
 tmw.handler.SMSG_NPC_BUY = function (msg) {
-	var table = $("<table>");
+	var table = document.createElement("table");
+	table.style.borderSpacing = "2px 0px";
 	var count = msg.getSize() / 11;
 	for (var i=0; i<count; i++) {
 		var price = msg.read32();
 		msg.skip(4); // DCvalue
 		msg.skip(1); // type
 		var itemId = msg.read16();
-		var row = $("<tr>")
-			.attr("id", "showContentRow" + i)
-			.attr("itemId", itemId)
-			.attr("price", price)
-			.click(function (event) {tmw.gui.shop.selectRow(event.currentTarget);})
-			.html("<td>" + tmw.itemDB[itemId].name + "</td>" +
-				"<td align='right'>" + price + " GP</td>")
-			.appendTo(table);
+		var item = tmw.itemDB[itemId];
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		tr.dataset.itemId = itemId;
+		tr.dataset.price = price;
+		tr.onclick = function(event) {tmw.gui.shop.selectRow(event.currentTarget);};
+		tr.innerHTML = "<td style='padding:0px'><canvas width=32 height=32></td>" +
+			"<td>" + item.name + "</td>" +
+			"<td align='right'>" + price + " GP</td>";
+		tr.childNodes[0].childNodes[0].getContext("2d").drawImage(item.image, 0, 0);
 	}
 	tmw.gui.shop.setBuyTable(table);
 };
 
 tmw.handler.SMSG_NPC_SELL = function (msg) {
-	var table = $("<table>");
+	var table = document.createElement("table");
+	table.style.borderSpacing = "2px 0px";
 	var count = msg.getSize() / 10;
 	for (var i=0; i<count; i++) {
 		var slot = msg.read16() - 2;
@@ -90,16 +94,17 @@ tmw.handler.SMSG_NPC_SELL = function (msg) {
 		var inv = tmw.inventory[slot];
 		if (inv.isEquipped)
 			continue;
-		var row = $("<tr>")
-			.attr("id", "showContentRow" + i)
-			.attr("itemId", inv.item.id)
-			.attr("slot", slot)
-			.attr("price", price)
-			.click(function (event) {tmw.gui.shop.selectRow(event.currentTarget);})
-			.html("<td align='right'>" + inv.amount + "</td>" +
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		tr.dataset.itemId = inv.item.id;
+		tr.dataset.slot = slot;
+		tr.dataset.price = price;
+		tr.onclick = function (event) {tmw.gui.shop.selectRow(event.currentTarget);};
+		tr.innerHTML = "<td style='padding:0px'><canvas width=32 height=32></td>" +
+				"<td align='right'>" + inv.amount + "</td>" +
 				"<td>" + inv.item.name + "</td>" +
-				"<td align='right'>" + price + " GP</td>")
-			.appendTo(table);
+				"<td align='right'>" + price + " GP</td>";
+		tr.childNodes[0].childNodes[0].getContext("2d").drawImage(inv.item.image, 0, 0);
 	}
 	tmw.gui.shop.setSellTable(table);
 };

@@ -116,9 +116,22 @@ function readItemsXml() { // Todo: sound, replace
 			item.imagePath = "graphics/items/" + item.image.slice(0, separator);
 			item.imageColor = item.image.slice(separator + 1);
 		}
-		delete item.image;
+		loadItemImage(item);
 	}
 	tmw.loadDataCounter.readXmlFinished();
+
+	function loadItemImage(item) {
+		var png = loadPngFromZip(item.imagePath, function () {
+			var canvas = document.createElement("canvas");
+			canvas.width = 32;
+			canvas.height = 32;
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(png, 0, 0);
+			if (item.imageColor) dye(canvas, [item.imageColor]);
+			item.image = canvas;
+		});
+		png.item = item;
+	}
 }
 
 function readMonstersXml() { // Todo: sound, particlefx, attack

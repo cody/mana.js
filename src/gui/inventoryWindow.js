@@ -119,7 +119,7 @@ function createInventoryWindow() {
 	function onUseButtonClick() {
 		if (selectedItemIndex !== null && tmw.inventory[selectedItemIndex]) {
 			if (tmw.inventory[selectedItemIndex].equipType) {
-				if (tmw.inventory[selectedItemIndex].isEquiped) {
+				if (tmw.inventory[selectedItemIndex].isEquipped) {
 					var msg = newOutgoingMessage("CMSG_PLAYER_UNEQUIP");
 					msg.write16(selectedItemIndex + 2);
 					msg.send();
@@ -180,7 +180,7 @@ function createInventoryWindow() {
 			useButton.attr("disabled", false);
 			dropButton.attr("disabled", false);
 			if (tmw.inventory[selectedItemIndex].equipType) {
-				if (tmw.inventory[selectedItemIndex].isEquiped)
+				if (tmw.inventory[selectedItemIndex].isEquipped)
 					useButton.text("Unequip");
 				else
 					useButton.text("Equip");
@@ -205,21 +205,16 @@ function createInventoryWindow() {
 		for (var i in tmw.inventory) {
 			var inv = tmw.inventory[i];
 			if (inv === null) continue;
-			if (inv.item.image) {
-				var left = (i % itemsPerLine) * 34;
-				var top = Math.floor(i / itemsPerLine) * 43;
-				context.drawImage(inv.item.image, left, top);
-				var text = "";
-				if (!inv.equipType || inv.equipType === 0x8000) {
-					if (inv.amount > 1) text = inv.amount;
-				} else if (inv.isEquiped) {
-					text = "Eq.";
-				}
-				context.fillText(text, left + 16, top + 41);
-			} else if (inv.item.image === undefined) {
-				loadItemImage(inv.item);
-				inv.item.image = null;
+			var left = (i % itemsPerLine) * 34;
+			var top = Math.floor(i / itemsPerLine) * 43;
+			context.drawImage(inv.item.image, left, top);
+			var text = "";
+			if (!inv.equipType || inv.equipType === 0x8000) {
+				if (inv.amount > 1) text = inv.amount;
+			} else if (inv.isEquipped) {
+				text = "Eq.";
 			}
+			context.fillText(text, left + 16, top + 41);
 		}
 		if (selectedItemIndex !== null) {
 			if (selectedItemIndex < tmw.inventory.length) {

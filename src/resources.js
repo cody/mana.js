@@ -39,20 +39,6 @@ function loadPngFromZip(name, callback) {
 	return png;
 }
 
-function loadItemImage(item) {
-	var png = loadPngFromZip(item.imagePath, function () {
-		var canvas = document.createElement("canvas");
-		canvas.width = 32;
-		canvas.height = 32;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(png, 0, 0);
-		if (item.imageColor) dye(canvas, [item.imageColor]);
-		this.item.image = canvas;
-		tmw.gui.inventory.draw();
-	});
-	png.item = item;
-}
-
 function dye(canvas, color) {
 	var R, G, B, A;
 	var ctx = canvas.getContext("2d");

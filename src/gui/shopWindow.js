@@ -126,21 +126,21 @@ function createShopWindow() {
 			if (isOpen === "buy") {
 				var msg = newOutgoingMessage("CMSG_NPC_BUY_REQUEST");
 				msg.write16(amount);
-				msg.write16(Number(selected.attributes.itemId.value));
+				msg.write16(Number(selected.dataset.itemId));
 				msg.send();
 				money -= price * amount;
 				max = Math.min(Math.floor(money / price), 30000);
 				update(1);
 			} else if (isOpen === "sell") {
 				var msg = newOutgoingMessage("CMSG_NPC_SELL_REQUEST");
-				msg.write16(Number(selected.attributes["slot"].value) + 2);
+				msg.write16(Number(selected.dataset.slot) + 2);
 				msg.write16(amount);
 				msg.send();
 				if (amount === max) {
 					selected.remove();
 					update();
 				} else {
-					var tdAmount = selected.getElementsByTagName("td")[0];
+					var tdAmount = selected.getElementsByTagName("td")[1];
 					max = tdAmount.innerText - amount;
 					tdAmount.innerText = max;
 					update(1);
@@ -190,13 +190,13 @@ function createShopWindow() {
 			selected.style.background = "White";
 		selected = row;
 		selected.style.background = "Khaki";
-		price = selected.attributes["price"].value;
+		price = selected.dataset.price;
 		switch (isOpen) {
 			case "buy":
 				max = Math.min(Math.floor(money / price), 30000);
 				break;
 			case "sell":
-				max = Number(selected.getElementsByTagName("td")[0].innerText);
+				max = Number(selected.getElementsByTagName("td")[1].innerText);
 				break;
 			default: console.error("Unknown isOpen");
 		}

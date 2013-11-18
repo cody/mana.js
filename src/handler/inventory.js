@@ -68,7 +68,7 @@ tmw.handler.SMSG_PLAYER_INVENTORY_ADD = function (msg) {
 tmw.handler.SMSG_PLAYER_ARROW_EQUIP = function (msg) {
 	var index = msg.read16() - 2;
 	if (tmw.inventory[index])
-		tmw.inventory[index].isEquiped = true;
+		tmw.inventory[index].isEquipped = true;
 	tmw.gui.inventory.draw();
 };
 
@@ -100,7 +100,7 @@ tmw.handler.SMSG_PLAYER_EQUIPMENT = function (msg) {
 		msg.skip(1); // refine
 		msg.skip(8); // cards
 		tmw.inventory[index] =
-			{item: item, amount: 1, equipType: equipType, isEquiped: Boolean(slot)};
+			{item: item, amount: 1, equipType: equipType, isEquipped: Boolean(slot)};
 		if (slot)
 			tmw.localplayer.equipment[equipTypeToSlotName(slot)] = item;
 	}
@@ -166,7 +166,7 @@ tmw.handler.SMSG_PLAYER_EQUIP = function (msg) {
 		tmw.localplayer.equipment[slot] = tmw.inventory[index].item;
 	else
 		console.warn("Equip index %d type %d", index, equipType);
-	tmw.inventory[index].isEquiped = true;
+	tmw.inventory[index].isEquipped = true;
 	tmw.gui.inventory.draw();
 };
 
@@ -188,7 +188,7 @@ tmw.handler.SMSG_PLAYER_UNEQUIP = function (msg) {
 		tmw.localplayer.equipment[slot] = null;
 	else
 		console.warn("Unequip index %d type %d", index, equipType);
-	tmw.inventory[index].isEquiped = false;
+	tmw.inventory[index].isEquipped = false;
 	tmw.gui.inventory.draw();
 };
 

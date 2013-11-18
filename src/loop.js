@@ -202,14 +202,9 @@ function createLoop() {
 		for (var i in tmw.floorItems) {
 			var floor = tmw.floorItems[i]
 			var item = tmw.itemDB[floor.itemId];
-			if (item.image) {
-				left = floor.x - scrollX;
-				top = floor.y - scrollY;
-				context.drawImage(item.image, left, top);
-			} else if (item.image === undefined) {
-				loadItemImage(item);
-				item.image = null;
-			}
+			left = floor.x - scrollX;
+			top = floor.y - scrollY;
+			context.drawImage(item.image, left, top);
 		}
 
 		drawParticleText(scrollX, scrollY);
