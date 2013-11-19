@@ -200,8 +200,10 @@ function createInventoryWindow() {
 			.attr("height", Math.ceil(tmw.inventory.length / itemsPerLine) * 43);
 		context.font = "9pt sans-serif";
 		context.textAlign = "center";
-		$("#slotBar").progressbar("value", tmw.inventory.length);
-		$("#slotBarLabel").text(tmw.inventory.length + "/100");
+		var len = 0;
+		for (var i in tmw.inventory) if (tmw.inventory[i]) len++;
+		$("#slotBar").progressbar("value", len);
+		$("#slotBarLabel").text(len + "/100");
 		for (var i in tmw.inventory) {
 			var inv = tmw.inventory[i];
 			if (inv === null) continue;
