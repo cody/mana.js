@@ -137,7 +137,8 @@ function createShopWindow() {
 				var remainder = amount;
 				for (var slot = 99; slot >= 0; slot--) {
 					var inv = tmw.inventory[slot];
-					if (!inv || inv.item.id !== selected.dataset.itemId)
+					if (!inv || inv.item.id !== selected.dataset.itemId ||
+						inv.isEquipped)
 						continue;
 					var takeAway = Math.min(remainder, inv.amount);
 					sellList.push({slot: slot, takeAway: takeAway});
