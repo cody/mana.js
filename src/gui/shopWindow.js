@@ -30,7 +30,7 @@ function createShopWindow() {
 		errorResponse: errorResponse,
 	};
 
-	var isOpen = false;
+	var isOpen = null;
 	var npcId = null;
 	var selected =  null;
 	var price = null;
@@ -123,6 +123,7 @@ function createShopWindow() {
 	$("#shopActionButton")
 		.css("float", "right")
 		.click(function () {
+			if (!selected) return;
 			if (isOpen === "buy") {
 				var msg = newOutgoingMessage("CMSG_NPC_BUY_REQUEST");
 				msg.write16(amount);
@@ -132,9 +133,27 @@ function createShopWindow() {
 				max = Math.min(Math.floor(money / price), 30000);
 				update(1);
 			} else if (isOpen === "sell") {
+				var sellList = [];
+				var remainder = amount;
+				for (var slot = 99; slot >= 0; slot--) {
+					var inv = tmw.inventory[slot];
+					if (!inv || inv.item.id !== selected.dataset.itemId)
+						continue;
+					var takeAway = Math.min(remainder, inv.amount);
+					sellList.push({slot: slot, takeAway: takeAway});
+					remainder -= takeAway;
+					if (remainder === 0)
+						break;
+				}
+				if (remainder) {
+					errorResponse("You don't have enough items.");
+					return;
+				}
 				var msg = newOutgoingMessage("CMSG_NPC_SELL_REQUEST");
-				msg.write16(Number(selected.dataset.slot) + 2);
-				msg.write16(amount);
+				for (var i in sellList) {
+					msg.write16(sellList[i].slot + 2);
+					msg.write16(sellList[i].takeAway);
+				}
 				msg.send();
 				if (amount === max) {
 					selected.remove();
@@ -171,7 +190,7 @@ function createShopWindow() {
 		npcId = null;
 		update();
 		win.toggle();
-		isOpen = false;
+		isOpen = null;
 	}
 
 	function errorResponse(text) {

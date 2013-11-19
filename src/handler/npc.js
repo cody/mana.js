@@ -87,6 +87,7 @@ tmw.handler.SMSG_NPC_SELL = function (msg) {
 	var table = document.createElement("table");
 	table.style.borderSpacing = "2px 0px";
 	var count = msg.getSize() / 10;
+	var list = [];
 	for (var i=0; i<count; i++) {
 		var slot = msg.read16() - 2;
 		var price = msg.read32();
@@ -94,17 +95,29 @@ tmw.handler.SMSG_NPC_SELL = function (msg) {
 		var inv = tmw.inventory[slot];
 		if (inv.isEquipped)
 			continue;
+		var alreadyInList = false;
+		for (var k in list) {
+			if (list[k].item === inv.item) {
+				alreadyInList = true;
+				break;
+			}
+		}
+		if (alreadyInList)
+			list[k].amount += inv.amount;
+		else
+			list.push({price: price, item: inv.item, amount: inv.amount});
+	}
+	for (var i in list) {
 		var tr = document.createElement("tr");
 		table.appendChild(tr);
-		tr.dataset.itemId = inv.item.id;
-		tr.dataset.slot = slot;
-		tr.dataset.price = price;
+		tr.dataset.itemId = list[i].item.id;
+		tr.dataset.price = list[i].price;
 		tr.onclick = function (event) {tmw.gui.shop.selectRow(event.currentTarget);};
 		tr.innerHTML = "<td style='padding:0px'><canvas width=32 height=32></td>" +
-				"<td align='right'>" + inv.amount + "</td>" +
-				"<td>" + inv.item.name + "</td>" +
-				"<td align='right'>" + price + " GP</td>";
-		tr.childNodes[0].childNodes[0].getContext("2d").drawImage(inv.item.image, 0, 0);
+				"<td align='right'>" + list[i].amount + "</td>" +
+				"<td>" + list[i].item.name + "</td>" +
+				"<td align='right'>" + list[i].price + " GP</td>";
+		tr.childNodes[0].childNodes[0].getContext("2d").drawImage(list[i].item.image, 0, 0);
 	}
 	tmw.gui.shop.setSellTable(table);
 };
