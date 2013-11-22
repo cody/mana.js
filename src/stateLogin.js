@@ -125,6 +125,8 @@ function stateLogin() {
 					serverList[i].account = dbList[i].account || "";
 					serverList[i].password = dbList[i].password || "";
 					serverList[i].character = dbList[i].character || "";
+					serverList[i].useRepository = dbList[i].useRepository || false;
+					serverList[i].repository = dbList[i].repository || null;
 				}
 			}
 		};
@@ -158,6 +160,31 @@ function stateLogin() {
 				document.getElementById("signUp").innerHTML =
 					"<span style='color:Red'>" + result + "</span>";
 			});
+		tmw.repository = null;
+		if (serverList[serverListIndex].useRepository) {
+			var folderId = serverList[serverListIndex].repository;
+			if (folderId) {
+				chrome.fileSystem.restoreEntry(folderId, function (entry) {
+						if (entry)
+							tmw.repository = entry;
+						else
+							repoError("Failed to open Repository.");
+					});
+			} else {
+				repoError("No repository set!");
+			}
+		};
+		function repoError(text) {
+			console.error("Repository error: " + text);
+			$("<div>")
+				.html(text)
+				.attr("title", "Repository Error")
+				.dialog({
+					dialogClass: "no-close",
+					buttons: { OK: function() { $(this).dialog("close"); }}
+				});
+			openLoginSettingsWindow();
+		}
 	}
 
 	function registrationEnabled(isEnabled) {
@@ -199,11 +226,17 @@ function stateLogin() {
 				"<div style='margin:5px'>" +
 				"<form id='radioServerList'></form>" +
 				"<table>" +
-				"<tr><td>Hostname:</td><td id='hostname'></td>" +
-				"<tr><td>Port:</td><td id='port'></td>" +
+				"<tr><td>Hostname:</td><td id='hostname' style='font-size:10pt'></td>" +
+				"<tr><td>Port:</td><td id='port' style='font-size:10pt'></td>" +
 				"<tr><td>Name:</td><td><input id='account'></td>" +
 				"<tr><td>Password:</td><td><input type='password' id='password'></td>" +
 				"<tr><td>Character:</td><td><input id='character'></td>" +
+				"<tr><td>Client data:</td><td style='font-size:10pt'>" +
+				"<form id='radioClientData'>" +
+				"<label><input type='radio' id='clientDataDefault' name='updates'>Default</input></label>" +
+				"<label><input type='radio' id='clientDataRepo' name='updates'>Repository</input></label>" +
+				"</form></td>" +
+				"<tr><td>Repository:</td><td><input id='repo'readonly></td>" +
 				"</table>" +
 				"<div style='float:right'>" +
 				"<button id='cancel'>Cancel</button>" +
@@ -218,12 +251,14 @@ function stateLogin() {
 			if (serverListIndex === serv)
 				changeRadioSettings({target: {value: serv}});
 		}
-		$("#radioServerList").change(changeRadioSettings);
-		$("#account").change(changeTextfieldSettings);
-		$("#password").change(changeTextfieldSettings);
-		$("#character").change(changeTextfieldSettings);
-		$("#cancel").click(cancelSettings);
-		$("#save").click(saveSettings);
+		document.getElementById("radioServerList").onchange = changeRadioSettings;
+		document.getElementById("account").onchange = changeTextfieldSettings;
+		document.getElementById("password").onchange = changeTextfieldSettings;
+		document.getElementById("character").onchange = changeTextfieldSettings;
+		document.getElementById("radioClientData").onchange = changeRadioRepo;
+		document.getElementById("repo").onclick = changeRepository;
+		document.getElementById("cancel").onclick = cancelSettings;
+		document.getElementById("save").onclick = saveSettings;
 	}
 
 	function changeRadioSettings(event) {
@@ -234,11 +269,52 @@ function stateLogin() {
 		$("#account").val(serverList[serverListIndex].account);
 		$("#password").val(serverList[serverListIndex].password);
 		$("#character").val(serverList[serverListIndex].character);
+		if (serverList[serverListIndex].useRepository)
+			document.getElementById("clientDataRepo").checked = true;
+		else
+			document.getElementById("clientDataDefault").checked = true;
+		var folderId = serverList[serverListIndex].repository;
+		if (folderId) {
+			chrome.fileSystem.restoreEntry(folderId, function (entry) {
+					if (!entry) {console.log("No restore"); return;}
+					console.log("restored");
+					document.getElementById("repo").value = entry.name;
+				});
+		} else {
+			document.getElementById("repo").value = "";
+		}
 	}
 
 	function changeTextfieldSettings() {
 		event.target.value = event.target.value.trim();
 		serverList[serverListIndex][event.target.id] = event.target.value;
+	}
+
+	function changeRadioRepo() {
+		var repo = document.getElementById("clientDataRepo").checked;
+		serverList[serverListIndex].useRepository = repo;
+	}
+
+	function changeRepository() {
+		try {
+		chrome.fileSystem.chooseEntry({type: "openDirectory"},
+			function (entry) {
+				if (!entry) return;
+				document.getElementById("repo").value = entry.name;
+				serverList[serverListIndex].repository = chrome.fileSystem.retainEntry(entry);
+			});
+		} catch (e) {
+			console.error("Repository needs Chrome 31 or higher! Exception was: " + e.message);
+			$("<div>")
+				.html("Repository requires Chrome version 31 or higher.")
+				.attr("title", "Repository error")
+				.dialog({
+					dialogClass: "no-close",
+					buttons: {
+						OK: function () { $(this).dialog("close"); }
+					}
+				});
+		}
 	}
 
 	function cancelSettings() {
@@ -279,6 +355,7 @@ function stateLogin() {
 		var rect = div.getBoundingClientRect();
 		div.style.left = Math.floor((window.innerWidth - rect.width) / 2) + "px";
 		div.style.top = Math.floor((window.innerHeight - rect.height) / 2) + "px";
+		div.style.fontSize = "12pt";
 		document.getElementById("male").onchange = function () { sex = "_M"; };
 		document.getElementById("female").onchange = function () { sex = "_F"; };
 		document.getElementById("cancel").onclick = function () {

@@ -76,7 +76,12 @@ tmw.state.STATE_LOGIN_ERROR = function (text) {
 };
 
 tmw.state.STATE_UPDATE = function () {
-	stateUpdate();
+	if (tmw.repository) {
+		console.log("Skipping updates, using repository");
+		tmw.state.set("STATE_LOAD_DATA");
+	} else {
+		stateUpdate();
+	}
 };
 
 tmw.state.STATE_LOAD_DATA = function () {

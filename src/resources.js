@@ -19,26 +19,79 @@
 
 "use strict";
 
-function loadXmlFromZip(name, callback) {
-	var uint8array = tmw.zipdata[tmw.data[name]].decompress(name);
-	var blob = new Blob([uint8array], {"type" : "text/xml"});
-	var url = URL.createObjectURL(blob);
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", url, true);
-	xhr.send(null);
-	xhr.onload = callback;
+function loadXml(name, callback) {
+	var xhr;
+	if (tmw.repository) {
+		xhr = {}; // mock xhr
+		tmw.repository.getFile(name, {},
+			function (fileEntry) {
+				fileEntry.file(
+					function (file) {
+						var reader = new FileReader();
+						reader.readAsText(file);
+						reader.onload = function (event) {
+							var parser = new window.DOMParser();
+							var xml = parser.parseFromString(this.result, "text/xml");
+							xhr.responseXML = xml;
+							callback.call(xhr);
+						};
+					},
+					function () { console.error("Error reading " + name); })
+			},
+			function () { loadResourceError(name) }
+		);
+	} else {
+		var uint8array = tmw.zipdata[tmw.data[name]].decompress(name);
+		var blob = new Blob([uint8array], {"type" : "text/xml"});
+		var url = URL.createObjectURL(blob);
+		xhr = new XMLHttpRequest();
+		xhr.open("GET", url, true);
+		xhr.send(null);
+		xhr.onload = callback;
+	}
 	return xhr;
 }
 
-function loadPngFromZip(name, callback) {
+function loadPng(name, callback) {
 	var png = document.createElement("img");
-	var uint8array = tmw.zipdata[tmw.data[name]].decompress(name);
-	var blob = new Blob([uint8array], {"type" : "image/png"});
-	png.src = URL.createObjectURL(blob);
-	png.onload = callback;
+	if (tmw.repository) {
+		tmw.repository.getFile(name, {},
+			function (fileEntry) {
+				fileEntry.file(
+					function (file) {
+						var reader = new FileReader();
+						reader.readAsDataURL(file);
+						reader.onload = function (event) {
+							png.src = this.result;
+							png.onload = callback;
+						};
+					},
+					function () { console.error("Error reading " + name); })
+			},
+			function () { loadResourceError(name) }
+		);
+	} else {
+		var uint8array = tmw.zipdata[tmw.data[name]].decompress(name);
+		var blob = new Blob([uint8array], {"type" : "image/png"});
+		png.src = URL.createObjectURL(blob);
+		png.onload = callback;
+	}
 	return png;
 }
 
+function loadResourceError(filename) {
+	console.error("Error loading file: " + filename);
+	$("<div>")
+		.html("Can't find file " + filename)
+		.attr("title", "Client Data Error")
+		.dialog({
+			dialogClass: "no-close",
+			buttons: {
+				Ignore: function () { $(this).dialog("close"); },
+				Quit: function () { tmw.state.set("STATE_START"); }
+			}
+		});
+}
 function dye(canvas, color) {
 	var R, G, B, A;
 	var ctx = canvas.getContext("2d");
@@ -186,7 +239,7 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 					s = equip.spriteFemale.split("|");
 				else
 					continue;
-				var xhr = loadXmlFromZip("graphics/sprites/" + s[0], loadFrames);
+				var xhr = loadXml("graphics/sprites/" + s[0], loadFrames);
 				xhr.mob = equip;
 				if (s.length === 2) xhr.color = [s[1]];
 			}
@@ -219,7 +272,7 @@ function updateHair(being) {
 	var key = being.equipment.hairStyle + "@" + being.equipment.hairColor;
 	if (!tmw.hairDB[key]) {
 		tmw.hairDB[key] = {key: key, frames: null};
-		var xhr = loadXmlFromZip("graphics/sprites/" + 
+		var xhr = loadXml("graphics/sprites/" +
 			tmw.hairStyleDB[being.equipment.hairStyle].sprite, loadFrames);
 		xhr.color = [tmw.hairColorDB[being.equipment.hairColor].color];
 		xhr.mob = tmw.hairDB[key];
@@ -231,7 +284,7 @@ function loadFrames() {
 	var include = this.responseXML.getElementsByTagName("include")[0];
 	if (include) {
 		var path = "graphics/sprites/" + include.attributes.file.value;
-		var xhr = loadXmlFromZip(path, loadFrames2);
+		var xhr = loadXml(path, loadFrames2);
 		xhr.imagesetXML = this;
 		xhr.color = this.color;
 		xhr.variant = this.variant;
@@ -248,7 +301,7 @@ function loadFrames2() {
 		if (!this.color) this.color = [];
 		this.color.push(srcArray[1]);
 	}
-	var png = loadPngFromZip(srcArray[0], readFrames);
+	var png = loadPng(srcArray[0], readFrames);
 	this.mob = this.imagesetXML.mob;
 	png.xml = this;
 	png.frameWidth = Number(imageset.attributes.width.value);

@@ -54,16 +54,10 @@ function createMaps() {
 		cache[name] = tmw.map;
 		tmw.map.fileName = name;
 		name = "maps/" + name + ".tmx";
-		var uint8array = tmw.zipdata[tmw.data[name]].decompress(name);
-		var blob = new Blob([uint8array], {"type" : "text/xml"});
-		var url = URL.createObjectURL(blob);
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, true);
-		xhr.send(null);
-		xhr.onload = function () {
+		loadXml(name, function () {
 			newOutgoingMessage("CMSG_MAP_LOADED").send();
-			var layers = xhr.responseXML.getElementsByTagName("layer");
-			var root = xhr.responseXML.getElementsByTagName("map")[0];
+			var layers = this.responseXML.getElementsByTagName("layer");
+			var root = this.responseXML.getElementsByTagName("map")[0];
 			tmw.map.width = root.attributes.width.value;
 			tmw.map.height = root.attributes.height.value;
 			var children = root.childNodes;
@@ -85,7 +79,7 @@ function createMaps() {
 					if (tmw.tilesets[source]) {
 						copyTiles(tmw.tilesets[source], firstgid);
 					} else {
-						var xhrTileset = loadXmlFromZip(source, readTileset);
+						var xhrTileset = loadXml(source, readTileset);
 						xhrTileset.name = source;
 						xhrTileset.firstgid = firstgid;
 					}
@@ -117,7 +111,7 @@ function createMaps() {
 				}
 			}
 			tmw.loop.start();
-		};
+		});
 	}
 }
 
@@ -129,7 +123,7 @@ function readTileset() {
 	var mockSource = xml.attributes["source"].value.slice(3);
 	// var pngWidth = Number(xml.attributes["width"].value);
 	// var pngHeight = Number(xml.attributes["height"].value);
-	var png = loadPngFromZip(mockSource, function () {
+	var png = loadPng(mockSource, function () {
 		var pos = 0;
 		for (var y=0; y<png.height; y+=tileHeight) {
 			for (var x=0; x<png.width; x+=tileWidth) {

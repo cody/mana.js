@@ -20,16 +20,16 @@
 "use strict";
 
 function stateLoadData() {
-	loadXmlFromZip("effects.xml", readEffectsXml);
-	loadXmlFromZip("emotes.xml", readEmotesXml);
-	loadXmlFromZip("hair.xml", readHairXml);
-	loadXmlFromZip("items.xml", readItemsXml);
-	loadXmlFromZip("monsters.xml", readMonstersXml);
-	loadXmlFromZip("npcs.xml", readNpcsXml);
-	loadXmlFromZip("graphics/sprites/player_female_base.xml", readPlayerSpritesFemale);
-	loadXmlFromZip("graphics/sprites/player_male_base.xml", readPlayerSpritesMale);
-	loadXmlFromZip("skills.xml", readSkillsXml);
-	loadXmlFromZip("status-effects.xml", readStatusEffectsXml);
+	loadXml("effects.xml", readEffectsXml);
+	loadXml("emotes.xml", readEmotesXml);
+	loadXml("hair.xml", readHairXml);
+	loadXml("items.xml", readItemsXml);
+	loadXml("monsters.xml", readMonstersXml);
+	loadXml("npcs.xml", readNpcsXml);
+	loadXml("graphics/sprites/player_female_base.xml", readPlayerSpritesFemale);
+	loadXml("graphics/sprites/player_male_base.xml", readPlayerSpritesMale);
+	loadXml("skills.xml", readSkillsXml);
+	loadXml("status-effects.xml", readStatusEffectsXml);
 	tmw.loadDataCounter = (function () {
 		var numberOfFiles = 10;
 		return {
@@ -56,7 +56,7 @@ function readEmotesXml() {
 		emote.image = document.createElement("canvas");
 		emote.image.width = 30;
 		emote.image.height = 32;
-		loadPngFromZip(emotes[i].attributes.image.value, loadEmote).emote = emote;
+		loadPng(emotes[i].attributes.image.value, loadEmote).emote = emote;
 		tmw.emoteDB.push(emote);
 	}
 	function loadEmote() {
@@ -121,7 +121,7 @@ function readItemsXml() { // Todo: sound, replace
 	tmw.loadDataCounter.readXmlFinished();
 
 	function loadItemImage(item) {
-		var png = loadPngFromZip(item.imagePath, function () {
+		var png = loadPng(item.imagePath, function () {
 			var canvas = document.createElement("canvas");
 			canvas.width = 32;
 			canvas.height = 32;
@@ -176,14 +176,14 @@ function readNpcsXml() {
 }
 
 function readPlayerSpritesFemale() {
-	var png = loadPngFromZip("graphics/sprites/player_female_base.png", function () {
+	var png = loadPng("graphics/sprites/player_female_base.png", function () {
 		readPlayerSprite(tmw.playerSet.female);
 	});
 	tmw.playerSet.female = {variable: "female", xml: this.responseXML, png: png};
 }
 
 function readPlayerSpritesMale() {
-	var png = loadPngFromZip("graphics/sprites/player_male_base.png", function () {
+	var png = loadPng("graphics/sprites/player_male_base.png", function () {
 		readPlayerSprite(tmw.playerSet.male);
 	});
 	tmw.playerSet.male = {variable: "male", xml: this.responseXML, png: png};
@@ -251,7 +251,7 @@ function readSkillsXml() {
 			var id = Number(skills[skill].attributes.id.value);
 			var skillName = skills[skill].attributes.name.value;
 			var icon = skills[skill].attributes.icon.value;
-			var png = loadPngFromZip(icon, $.noop);
+			var png = loadPng(icon, $.noop);
 			tmw.skillsDB[id] = {id: id, set: setName, name: skillName, png: png};
 		}
 	}
