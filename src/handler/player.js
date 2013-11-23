@@ -42,8 +42,8 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_1  = function (msg) {
 	var type = msg.read16();
 	var value = msg.read32();
 	switch (type) {
-		case 0x00: tmw.localplayer.moveSpeed = value;
-			tmw.gui.status.updateMoveSpeed();
+		case 0x00: tmw.localplayer.moveSpeed = 32 / value;
+			tmw.gui.status.updateMoveSpeed(value);
 			break;
 		case 0x04: tmw.localplayer.attributes.manner = value;
 			break;

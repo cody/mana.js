@@ -201,8 +201,8 @@ function createStatusWindow() {
 			$("#statusWindowValueMDef").text(a.mdefBase +
 				(a.mdefBonus ? (" + " + a.mdefBonus) : ""));
 		},
-		updateMoveSpeed: function () {
-			$("#statusWindowValueMoveSpeed").text(tmw.localplayer.moveSpeed);
+		updateMoveSpeed: function (value) {
+			$("#statusWindowValueMoveSpeed").text(value);
 		},
 	};
 }

@@ -55,7 +55,7 @@ function createLoop() {
 				}
 			}
 			if (tmw.localplayer.movePixelPath.length) {
-				var pixelsMoved = (32 / tmw.localplayer.moveSpeed) * deltaTime;
+				var pixelsMoved = tmw.localplayer.moveSpeed * deltaTime;
 				move(tmw.localplayer, pixelsMoved);
 				if (!tmw.localplayer.movePixelPath.length) {
 					processMovementInput();
@@ -157,7 +157,7 @@ function createLoop() {
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
 			if (being.movePixelPath.length) {
-				var pixelsMoved = (32 / being.moveSpeed) * deltaTime;
+				var pixelsMoved = being.moveSpeed * deltaTime;
 				move(being, pixelsMoved);
 				if (!being.movePixelPath.length) {
 					being.action = "stand";

@@ -75,7 +75,7 @@ tmw.handler.SMSG_PLAYER_UPDATE_2 = function (msg) {processPlayerPacket(msg, "SMS
 function processPlayerPacket(msg, msgType) {
 	var id = msg.read32();
 	var being = tmw.beings[id] || {id: id};
-	being.moveSpeed = msg.read16();
+	being.moveSpeed = 32 / msg.read16();
 	being.stunMode = msg.read16();
 	being.statusEffects = msg.read16() | (msg.read16() << 16); // Todo
 	being.job = msg.read16();
@@ -204,7 +204,7 @@ function processBeingPacket(msg, msgType) {
 	if (tmw.beings[id] && tmw.beings[id].action === "dead")
 		delete tmw.beings[id];
 	var being = tmw.beings[id] ? tmw.beings[id] : {id: id};
-	being.moveSpeed = msg.read16();
+	being.moveSpeed = 32 / msg.read16();
 	being.stunMode = msg.read16();
 	being.statusEffects = msg.read16() | (msg.read16() << 16); // Todo
 	being.job = msg.read16();
