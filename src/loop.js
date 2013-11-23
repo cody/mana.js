@@ -116,31 +116,36 @@ function createLoop() {
 		var scrollY = tmw.localplayer.y - midY;
 		var startX = Math.max(0, Math.floor(scrollX / 32));
 		var startY = Math.max(0, Math.floor(scrollY / 32));
-		var endX = Math.min(tmw.map.width, Math.ceil(game.width() + scrollX / 32));
+		var endX = Math.min(tmw.map.width, Math.ceil((game.width() + scrollX) / 32));
 		var endY = Math.min(tmw.map.height, 2 + Math.ceil((game.height() + scrollY) / 32));
 
 		// tiles
-		var left;
-		var top;
-		var src;
+		var left, top, src, yPixel, startIndex, index;
 		for (var l = 0; l < tmw.map.layers.length; l++) {
 			if (tmw.map.layers[l].name === "Collision" && !tmw.config.debugCollision)
 				continue;
-			for (var y = startY; y < endY; y++) { // Todo: use pixel for x and y
+			yPixel = (startY + 1) * 32 - scrollY;
+			startIndex = startY * tmw.map.width + startX;
+			for (var y = startY; y < endY; y++) {
+				index = startIndex;
+				left = startX * 32 - scrollX;
 				for (var x = startX; x < endX; x++) {
-					src = tmw.map.tiles[tmw.map.layers[l].data[y*tmw.map.width+x]];
-					if (!src) continue;
-					left = x * 32 - scrollX;
-					top = y * 32 - scrollY - src.height + 32;
-					context.drawImage(src, left, top);
+					src = tmw.map.tiles[tmw.map.layers[l].data[index++]];
+					if (src) {
+						top = yPixel - src.height;
+						context.drawImage(src, left, top);
+					}
+					left += 32;
 				}
+				yPixel += 32;
+				startIndex += tmw.map.width;
 			}
 		}
 
 		if (tmw.config.debugRaster) {
 			context.strokeStyle = "Black";
 			context.beginPath();
-			for (var x = startX; x < endX; x++) { // Todo: use pixel for x and y
+			for (var x = startX; x < endX; x++) {
 				for (var y = startY; y < endY; y++) {
 					left = x * 32 - scrollX;
 					top = y * 32 - scrollY;

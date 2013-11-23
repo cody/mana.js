@@ -58,8 +58,8 @@ function createMaps() {
 			newOutgoingMessage("CMSG_MAP_LOADED").send();
 			var layers = this.responseXML.getElementsByTagName("layer");
 			var root = this.responseXML.getElementsByTagName("map")[0];
-			tmw.map.width = root.attributes.width.value;
-			tmw.map.height = root.attributes.height.value;
+			tmw.map.width = Number(root.attributes.width.value);
+			tmw.map.height = Number(root.attributes.height.value);
 			var children = root.childNodes;
 			for (var i = 0; i < children.length; i++) {
 				switch (children[i].nodeName) {
