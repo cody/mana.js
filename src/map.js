@@ -19,25 +19,25 @@
 
 "use strict";
 
-function cleanOutMap() {
-	tmw.beings = {};
-	tmw.floorItems = {};
-	tmw.pickUpQueue.length = 0;
-	tmw.gui.social.resetBeingPresent();
-	tmw.gui.shop.close();
-	tmw.localplayer.action = "stand";
-	tmw.localplayer.sprite = null;
-	tmw.localplayer.speechText = null;
-	tmw.selectedBeing.clear();
-	tmw.textParticle.length = 0;
-}
-
 function createMaps() {
 	tmw.maps = {
 		loadMap: loadMap,
 	};
 
 	var cache = {};
+
+	function cleanOutMap() {
+		tmw.beings = {};
+		tmw.floorItems = {};
+		tmw.pickUpQueue.length = 0;
+		tmw.gui.social.resetBeingPresent();
+		tmw.gui.shop.close();
+		tmw.localplayer.action = "stand";
+		tmw.localplayer.sprite = null;
+		tmw.localplayer.speechText = null;
+		tmw.selectedBeing.clear();
+		tmw.textParticle.length = 0;
+	}
 
 	function loadMap(name) {
 		tmw.loop.stop();
@@ -113,35 +113,35 @@ function createMaps() {
 			tmw.loop.start();
 		});
 	}
-}
 
-function readTileset() {
-	var xml = this.responseXML.getElementsByTagName("tileset")[0];
-	var tileWidth = Number(xml.attributes["tilewidth"].value);
-	var tileHeight = Number(xml.attributes["tileheight"].value);
-	xml = this.responseXML.getElementsByTagName("image")[0];
-	var mockSource = xml.attributes["source"].value.slice(3);
-	// var pngWidth = Number(xml.attributes["width"].value);
-	// var pngHeight = Number(xml.attributes["height"].value);
-	var png = loadPng(mockSource, function () {
-		var pos = 0;
-		for (var y=0; y<png.height; y+=tileHeight) {
-			for (var x=0; x<png.width; x+=tileWidth) {
-				var canvas = document.createElement("canvas");
-				canvas.width = tileWidth;
-				canvas.height = tileHeight;
-				var ctx = canvas.getContext("2d");
-				ctx.drawImage(this, x, y, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
-				this.tileset[pos++] = canvas;
+	function readTileset() {
+		var xml = this.responseXML.getElementsByTagName("tileset")[0];
+		var tileWidth = Number(xml.attributes["tilewidth"].value);
+		var tileHeight = Number(xml.attributes["tileheight"].value);
+		xml = this.responseXML.getElementsByTagName("image")[0];
+		var mockSource = xml.attributes["source"].value.slice(3);
+		// var pngWidth = Number(xml.attributes["width"].value);
+		// var pngHeight = Number(xml.attributes["height"].value);
+		var png = loadPng(mockSource, function () {
+			var pos = 0;
+			for (var y=0; y<png.height; y+=tileHeight) {
+				for (var x=0; x<png.width; x+=tileWidth) {
+					var canvas = document.createElement("canvas");
+					canvas.width = tileWidth;
+					canvas.height = tileHeight;
+					var ctx = canvas.getContext("2d");
+					ctx.drawImage(this, x, y, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+					this.tileset[pos++] = canvas;
+				}
 			}
-		}
-		copyTiles(this.tileset, this.firstgid);
-	});
-	png.firstgid = this.firstgid;
-	png.tileset = [];
-	tmw.tilesets[this.name] = png.tileset;
-}
+			copyTiles(this.tileset, this.firstgid);
+		});
+		png.firstgid = this.firstgid;
+		png.tileset = [];
+		tmw.tilesets[this.name] = png.tileset;
+	}
 
-function copyTiles(cache, firstgid) {
-	for (var i=0; i<cache.length; i++) tmw.map.tiles[i + firstgid] = cache[i];
+	function copyTiles(cache, firstgid) {
+		for (var i=0; i<cache.length; i++) tmw.map.tiles[i + firstgid] = cache[i];
+	}
 }
