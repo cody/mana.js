@@ -46,6 +46,7 @@ function createLoop() {
 		var deltaTime = timeAnimation - tmw.timeAnimation;
 		tmw.timeAnimation = timeAnimation;
 
+		// localplayer actions
 		if (tmw.localplayer.action !== "dead" && !tmw.gui.npc.isOpen()) {
 			if (!tmw.localplayer.movePixelPath.length) {
 				processMovementInput();
@@ -98,6 +99,19 @@ function createLoop() {
 				itemPickUp();
 		}
 
+		// being movement
+		for (var i in tmw.beings) {
+			var being = tmw.beings[i];
+			if (!being.movePixelPath.length) continue;
+			var pixelsMoved = being.moveSpeed * deltaTime;
+			move(being, pixelsMoved);
+			if (!being.movePixelPath.length) {
+				being.action = "stand";
+				being.sprite = null;
+			}
+		}
+
+		// fps
 		if (tmw.config.showFps) {
 			countFps++;
 			if (timeAnimation >= checkFps) {
@@ -108,22 +122,20 @@ function createLoop() {
 		}
 
 		var context = tmw.context;
-		var midX = Math.floor(game.width() / 2);
-		var midY = Math.floor(game.height() / 2);
 		context.clearRect(0, 0, game.width(), game.height());
-
-		var scrollX = tmw.localplayer.x - midX;
-		var scrollY = tmw.localplayer.y - midY;
+		var scrollX = tmw.localplayer.x - Math.floor(game.width() / 2);
+		var scrollY = tmw.localplayer.y - Math.floor(game.height() / 2);
 		var startX = Math.max(0, Math.floor(scrollX / 32));
 		var startY = Math.max(0, Math.floor(scrollY / 32));
 		var endX = Math.min(tmw.map.width, Math.ceil((game.width() + scrollX) / 32));
 		var endY = Math.min(tmw.map.height, 2 + Math.ceil((game.height() + scrollY) / 32));
 
 		// tiles
-		var left, top, src, yPixel, startIndex, index;
+		var isFringe, left, top, src, yPixel, startIndex, index;
 		for (var l = 0; l < tmw.map.layers.length; l++) {
 			if (tmw.map.layers[l].name === "Collision" && !tmw.config.debugCollision)
 				continue;
+			isFringe = tmw.map.layers[l].name === "Fringe";
 			yPixel = (startY + 1) * 32 - scrollY;
 			startIndex = startY * tmw.map.width + startX;
 			for (var y = startY; y < endY; y++) {
@@ -136,6 +148,17 @@ function createLoop() {
 						context.drawImage(src, left, top);
 					}
 					left += 32;
+				}
+				if (isFringe) {
+					for (var i in tmw.beings) {
+						var being = tmw.beings[i];
+						if (y !== Math.floor(being.y / 32)) continue;
+						if (being.isSelected)
+							tmw.selectedBeing.draw(scrollX, scrollY, timeAnimation);
+						drawSprites(being, scrollX, scrollY, timeAnimation);
+					}
+					if (y === Math.floor(tmw.localplayer.y / 32))
+						drawSprites(tmw.localplayer, scrollX, scrollY, timeAnimation);
 				}
 				yPixel += 32;
 				startIndex += tmw.map.width;
@@ -161,18 +184,6 @@ function createLoop() {
 
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
-			if (being.movePixelPath.length) {
-				var pixelsMoved = being.moveSpeed * deltaTime;
-				move(being, pixelsMoved);
-				if (!being.movePixelPath.length) {
-					being.action = "stand";
-					being.sprite = null;
-				}
-			}
-
-			if (being.isSelected)
-				tmw.selectedBeing.draw(scrollX, scrollY, timeAnimation);
-			drawSprites(being, scrollX, scrollY, timeAnimation);
 			var text = null;
 			switch (being.type) {
 				case "PLAYER":
@@ -197,7 +208,6 @@ function createLoop() {
 			if (being.emoteImage) drawEmote(being, scrollX, scrollY);
 			if (being.speechText) drawSpeech(being, scrollX, scrollY);
 		}
-		drawSprites(tmw.localplayer, scrollX, scrollY, timeAnimation);
 		context.fillStyle = "LightSkyBlue";
 		context.fillText(tmw.localplayer.name, tmw.localplayer.x - scrollX,
 			tmw.localplayer.y + 26 - scrollY);

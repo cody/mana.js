@@ -56,7 +56,6 @@ function createMaps() {
 		name = "maps/" + name + ".tmx";
 		loadXml(name, function () {
 			newOutgoingMessage("CMSG_MAP_LOADED").send();
-			var layers = this.responseXML.getElementsByTagName("layer");
 			var root = this.responseXML.getElementsByTagName("map")[0];
 			tmw.map.width = Number(root.attributes.width.value);
 			tmw.map.height = Number(root.attributes.height.value);
@@ -87,17 +86,16 @@ function createMaps() {
 				case "layer":
 					var name = children[i].attributes["name"].value;
 					var dataset = children[i].getElementsByTagName("data")[0];
-					var orginal = dataset.textContent;
 					var encoding = dataset.attributes.encoding.value;
 					if (encoding === "base64") {
-						var string = atob(orginal.trim());
+						var string = atob(dataset.textContent.trim());
 						var array = new Uint8Array(new ArrayBuffer(string.length));
 						for (var pos=0; pos<string.length; pos++)
 							array[pos] = string.charCodeAt(pos);
 						var gunzip = new Zlib.Gunzip(array);
 						var data = new Uint32Array(gunzip.decompress().buffer);
 					} else { // csv
-						var data = orginal.split(",");
+						var data = dataset.textContent.split(",");
 						for (var pos=0; pos<data.length; pos++)
 							data[pos] = Number(data[pos]);
 					}
