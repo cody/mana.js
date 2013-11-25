@@ -52,6 +52,8 @@ tmw.handler.SMSG_CONNECTION_PROBLEM = function(msg) {
 tmw.handler.SMSG_MAP_LOGIN_SUCCESS = function (msg) {
 	msg.skip(4); // server tick
 	var coord = msg.readCoordinate();
+	tmw.localplayer.xTile = coord.x;
+	tmw.localplayer.yTile = coord.y;
 	tmw.localplayer.x = coord.x * 32 + 16;
 	tmw.localplayer.y = coord.y * 32 + 16;
 	tmw.localplayer.direction = coord.direction;

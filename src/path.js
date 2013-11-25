@@ -34,9 +34,11 @@ function createPathSearch() {
 		being.movePixelPath.length = 0;
 		movePath.length = 0;
 		if (being.x) {
-			srcX = Math.floor(being.x / 32);
-			srcY = Math.floor(being.y / 32);
+			srcX = being.xTile;
+			srcY = being.yTile;
 		} else {
+			being.xTile = srcX;
+			being.yTile = srcY;
 			being.x = srcX * 32 + 16;
 			being.y = srcY * 32 + 16;
 		}
@@ -45,6 +47,8 @@ function createPathSearch() {
 		var posX = srcX * 32 + 16;
 		var posY = srcY * 32 + 16;
 		if (srcX === dstX && srcY === dstY) {
+			being.tileX = srcX;
+			being.tileY = srcY;
 			being.x = posX;
 			being.y = posY;
 			if (being.action !== "stand") {
@@ -55,6 +59,8 @@ function createPathSearch() {
 		}
 		search(srcX, srcY, dstX, dstY);
 		if (!movePath.length) {
+			being.xTile = dstX;
+			being.yTile = dstY;
 			being.x = dstX * 32 + 16;
 			being.y = dstY * 32 + 16;
 			being.action = "stand";

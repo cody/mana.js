@@ -124,8 +124,8 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_1  = function (msg) {
 	if (tmw.localplayer.attributes.hp === 0 && tmw.localplayer.action !== "dead") {
 		if (tmw.localplayer.action === "walk") {
 			tmw.localplayer.movePixelPath = 0;
-			tmw.localplayer.x = Math.floor(tmw.localplayer.x / 32) * 32 + 16;
-			tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
+			tmw.localplayer.x = tmw.localplayer.xTile * 32 + 16;
+			tmw.localplayer.y = tmw.localplayer.yTile * 32 + 16;
 		}
 		tmw.localplayer.action = "dead";
 		tmw.localplayer.sprite = null;
@@ -231,8 +231,10 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_6 = function (msg) {
 
 tmw.handler.SMSG_PLAYER_WARP = function (msg) {
 	tmw.maps.loadMap(msg.readString(16, true));
-	tmw.localplayer.x = msg.read16() * 32 + 16;
-	tmw.localplayer.y = msg.read16() * 32 + 16;
+	tmw.localplayer.xTile = msg.read16();
+	tmw.localplayer.yTile = msg.read16();
+	tmw.localplayer.x = tmw.localplayer.xTile * 32 + 16;
+	tmw.localplayer.y = tmw.localplayer.yTile * 32 + 16;
 	tmw.localplayer.movePixelPath.length = 0;
 };
 
@@ -250,12 +252,10 @@ function playerChangeDirection(dir) {
 
 function buildPickUpQueue() {
 	if (tmw.pickUpQueue.length) return;
-	var playerX = Math.floor(tmw.localplayer.x / 32);
-	var playerY = Math.floor(tmw.localplayer.y / 32);
 	for (var f in tmw.floorItems) {
 		var floor = tmw.floorItems[f];
-		var dx = Math.abs(floor.x / 32 - playerX);
-		var dy = Math.abs(floor.y / 32 - playerY);
+		var dx = Math.abs(floor.xTile - tmw.localplayer.xTile);
+		var dy = Math.abs(floor.yTile - tmw.localplayer.yTile);
 		if (dx <= 1 && dy <= 1)
 			tmw.pickUpQueue.push(floor);
 	}
@@ -265,13 +265,11 @@ function buildPickUpQueue() {
 
 function itemPickUp() {
 	if (!tmw.net.packetLimiter("CMSG_ITEM_PICKUP")) return;
-	var playerX = Math.floor(tmw.localplayer.x / 32);
-	var playerY = Math.floor(tmw.localplayer.y / 32);
 	while (tmw.pickUpQueue.length) {
 		var floor = tmw.pickUpQueue.pop();
 		if (!tmw.floorItems[floor.id]) continue;
-		var dx = Math.abs(floor.x / 32 - playerX);
-		var dy = Math.abs(floor.y / 32 - playerY);
+		var dx = Math.abs(floor.xTile - tmw.localplayer.xTile);
+		var dy = Math.abs(floor.yTile - tmw.localplayer.yTile);
 		if (dx <= 1 && dy <= 1) {
 			var msg = newOutgoingMessage("CMSG_ITEM_PICKUP");
 			msg.write32(floor.id);

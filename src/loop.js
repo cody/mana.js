@@ -82,10 +82,8 @@ function createLoop() {
 						msg.write32(selected.id);
 						msg.write8(0);
 						msg.send();
-						var dx = Math.abs(Math.floor(selected.x / 32) -
-							Math.floor(tmw.localplayer.x / 32));
-						var dy = Math.abs(Math.floor(selected.y / 32) -
-							Math.floor(tmw.localplayer.y / 32));
+						var dx = Math.abs(selected.xTile - tmw.localplayer.xTile);
+						var dy = Math.abs(selected.yTile - tmw.localplayer.yTile);
 						if (dy && dy >= dx)
 							var dir = (selected.y - tmw.localplayer.y) > 0 ? 1 : 4;
 						else if (dx)
@@ -152,12 +150,12 @@ function createLoop() {
 				if (isFringe) {
 					for (var i in tmw.beings) {
 						var being = tmw.beings[i];
-						if (y !== Math.floor(being.y / 32)) continue;
+						if (y !== being.yTile) continue;
 						if (being.isSelected)
 							tmw.selectedBeing.draw(scrollX, scrollY, timeAnimation);
 						drawSprites(being, scrollX, scrollY, timeAnimation);
 					}
-					if (y === Math.floor(tmw.localplayer.y / 32))
+					if (y === tmw.localplayer.yTile)
 						drawSprites(tmw.localplayer, scrollX, scrollY, timeAnimation);
 				}
 				yPixel += 32;
@@ -280,6 +278,8 @@ function createLoop() {
 		}
 		being.x = Math.round(being.xFloat);
 		being.y = Math.round(being.yFloat);
+		being.xTile = Math.floor(being.x / 32);
+		being.yTile = Math.floor(being.y / 32);
 	}
 
 	function drawEmote(being, scrollX, scrollY) {

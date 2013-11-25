@@ -106,9 +106,10 @@ function processPlayerPacket(msg, msgType) {
 	} else {
 		var coord = msg.readCoordinate();
 		if (being.x) {
-			tmw.path.findPath(being, Math.floor(being.x / 32), Math.floor(being.y / 32),
-				coord.x, coord.y);
+			tmw.path.findPath(being, being.xTile, being.yTile, coord.x, coord.y);
 		} else {
+			being.xTile = coord.x;
+			being.yTile = coord.y;
 			being.x = coord.x * 32 + 16;
 			being.y = coord.y * 32 + 16;
 			being.movePixelPath.length = 0;
@@ -238,9 +239,10 @@ function processBeingPacket(msg, msgType) {
 		being.action = "stand";
 		var coord = msg.readCoordinate();
 		if (being.x) {
-			tmw.path.findPath(being, Math.floor(being.x / 32),
-				Math.floor(being.y / 32), coord.x, coord.y);
+			tmw.path.findPath(being, being.xTile, being.yTile, coord.x, coord.y);
 		} else {
+			being.xTile = coord.x;
+			being.yTile = coord.y;
 			being.x = coord.x * 32 + 16;
 			being.y = coord.y * 32 + 16;
 			being.sprite = null;
@@ -358,8 +360,8 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 	if (!dstBeing) return;
 	dstBeing.damageTaken += damage;
 	if (!srcBeing) return;
-	var dx = Math.abs(Math.floor(dstBeing.x / 32) - Math.floor(srcBeing.x / 32));
-	var dy = Math.abs(Math.floor(dstBeing.y / 32) - Math.floor(srcBeing.y / 32));
+	var dx = Math.abs(dstBeing.xTile - srcBeing.xTile);
+	var dy = Math.abs(dstBeing.yTile - srcBeing.yTile);
 	if (dy && dy >= dx)
 		var dir = (dstBeing.y - srcBeing.y) > 0 ? 1 : 4;
 	else if (dx)
@@ -380,8 +382,10 @@ tmw.handler.SMSG_BEING_SELFEFFECT = function (msg) {
 tmw.handler.SMSG_PLAYER_STOP = function (msg) {
 	var being = tmw.beings[msg.read32()];
 	if (!being) return;
-	being.x = msg.read16() * 32 + 16;
-	being.y = msg.read16() * 32 + 16;
+	being.xTile = msg.read16();
+	being.yTile = msg.read16();
+	being.x = being.xTile * 32 + 16;
+	being.y = being.yTile * 32 + 16;
 	if (being.movePixelPath.length) {
 		being.movePixelPath.length = 0;
 		being.action = "stand";

@@ -110,10 +110,8 @@ function createSelectedBeing() {
 		if (being.type === "NPC") {
 			range = "inRange";
 		} else {
-			var dx = Math.abs(Math.floor(tmw.localplayer.x / 32) -
-				Math.floor(being.x / 32));
-			var dy = Math.abs(Math.floor(tmw.localplayer.y / 32) -
-				Math.floor(being.y / 32));
+			var dx = Math.abs(tmw.localplayer.xTile - being.xTile);
+			var dy = Math.abs(tmw.localplayer.yTile - being.yTile);
 			if (Math.max(dx, dy) <= tmw.localplayer.attackRange)
 				range = "inRange";
 			else

@@ -69,8 +69,8 @@ function createNPCWindow() {
 			tmw.localplayer.action = "stand";
 			tmw.localplayer.sprite = null;
 			tmw.localplayer.movePixelPath = 0;
-			tmw.localplayer.x = Math.floor(tmw.localplayer.x / 32) * 32 + 16;
-			tmw.localplayer.y = Math.floor(tmw.localplayer.y / 32) * 32 + 16;
+			tmw.localplayer.x = tmw.localplayer.xTile * 32 + 16;
+			tmw.localplayer.y = tmw.localplayer.yTile * 32 + 16;
 		}
 		win.toggle();
 		$("#npcWindowName").text(tmw.beings[id] && tmw.beings[id].name ?

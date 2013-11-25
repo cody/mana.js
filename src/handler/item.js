@@ -22,25 +22,27 @@
 tmw.handler.SMSG_ITEM_VISIBLE = function (msg) {
 	var id = msg.read32();
 	var itemId = msg.read16();
-	var identifyFlag = msg.read8();
-	var x = msg.read16() * 32;
-	var y = msg.read16() * 32;
+	msg.skip(1); // identifyFlag
+	var xTile = msg.read16();
+	var yTile = msg.read16();
 	var amount = msg.read16();
-	var subX = msg.read8(); // Todo: What is that?
-	var subY = msg.read8();
-	tmw.floorItems[id] = {id: id, itemId: itemId, x: x, y: y, amount: amount, subX: subX, subY: subY};
+	// var subX = msg.read8();
+	// var subY = msg.read8();
+	tmw.floorItems[id] = {id: id, itemId: itemId, xTile: xTile, yTile: yTile,
+		x: xTile * 32, y: yTile * 32, amount: amount};
 };
 
 tmw.handler.SMSG_ITEM_DROPPED = function (msg) {
 	var id = msg.read32();
 	var itemId = msg.read16();
-	var identifyFlag = msg.read8();
-	var x = msg.read16() * 32;
-	var y = msg.read16() * 32;
+	msg.skip(1); // identifyFlag
+	var xTile = msg.read16();
+	var yTile = msg.read16();
 	var subX = msg.read8();
 	var subY = msg.read8();
 	var amount = msg.read16();
-	tmw.floorItems[id] = {id: id, itemId: itemId, x: x, y: y, amount: amount, subX: subX, subY: subY};
+	tmw.floorItems[id] = {id: id, itemId: itemId, xTile: xTile, yTile: yTile,
+		x: xTile * 32, y: yTile * 32, amount: amount};
 };
 
 tmw.handler.SMSG_ITEM_REMOVE = function (msg) {

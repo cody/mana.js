@@ -148,8 +148,8 @@ function createInput() {
 function processMovementInput() {
 	var arrow = tmw.input.getArrowKeys();
 	if (!arrow) return;
-	var posX = Math.floor(tmw.localplayer.x / 32);
-	var posY = Math.floor(tmw.localplayer.y / 32);
+	var posX = tmw.localplayer.xTile;
+	var posY = tmw.localplayer.yTile;
 	var dx = 0;
 	var dy = 0;
 	if (arrow & 1) dy++;
