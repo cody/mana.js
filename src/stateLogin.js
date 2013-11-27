@@ -34,10 +34,6 @@ function stateLogin() {
 			name: "Testing Server",
 			hostname: "testing.themanaworld.org",
 			port: 6902},
-		"caliban.homeip.net:6901": {
-			name: "The Testing World",
-			hostname: "caliban.homeip.net",
-			port: 6901},
 		"127.0.0.1:6901": {
 			name: "Localhost",
 			hostname: "127.0.0.1",
