@@ -24,7 +24,7 @@ function readCharacterData(msg) {
 	c.id = tmw.net.token.accountId;
 	c.attributes = {};
 	c.states = {};
-	c.equipment = {};
+	c.equipment = [];
 	c.sex = tmw.net.token.sex;
 	c.template = tmw.playerSet[c.sex ? "male" : "female"];
 	c.charId = msg.read32();
@@ -32,10 +32,10 @@ function readCharacterData(msg) {
 	c.attributes.money = msg.read32();
 	c.attributes.jobXp = msg.read32();
 	c.attributes.jobBase = msg.read32();
-	c.equipment.shoes = tmw.itemDB[msg.read16()];
-	c.equipment.gloves = tmw.itemDB[msg.read16()];
-	c.equipment.cape = tmw.itemDB[msg.read16()];
-	c.equipment.misc1 = tmw.itemDB[msg.read16()];
+	setEquipment(c, "shoes", msg.read16());
+	setEquipment(c, "gloves", msg.read16());
+	setEquipment(c, "cape", msg.read16());
+	setEquipment(c, "misc1", msg.read16());
 	msg.skip(4); // option
 	msg.skip(4); // karma
 	msg.skip(4); // manner
@@ -46,16 +46,16 @@ function readCharacterData(msg) {
 	c.attributes.mpMax = msg.read16();
 	msg.skip(2); // speed
 	c.race = msg.read16();
-	c.equipment.hairStyle = msg.read16();
-	c.equipment.weapon = tmw.itemDB[msg.read16()];
+	setEquipment(c, "hairStyle", msg.read16());
+	setEquipment(c, "weapon", msg.read16());
 	c.attributes.level = msg.read16();
 	msg.skip(2); // skill point
-	c.equipment.bottomClothes = tmw.itemDB[msg.read16()];
-	c.equipment.shield = tmw.itemDB[msg.read16()];
-	c.equipment.hat = tmw.itemDB[msg.read16()];
-	c.equipment.topClothes = tmw.itemDB[msg.read16()];
-	c.equipment.hairColor = msg.read16();
-	c.equipment.misc2 = tmw.itemDB[msg.read16()];
+	setEquipment(c, "bottomClothes", msg.read16());
+	setEquipment(c, "shield", msg.read16());
+	setEquipment(c, "hat", msg.read16());
+	setEquipment(c, "topClothes", msg.read16());
+	setEquipment(c, "hairColor", msg.read16());
+	setEquipment(c, "misc2", msg.read16());
 	c.nameInsecure = msg.readString(24);
 	c.name = htmlToText(c.nameInsecure);
 	c.states.strBase = msg.read8();
@@ -66,7 +66,6 @@ function readCharacterData(msg) {
 	c.states.lukBase = msg.read8();
 	c.slot = msg.read8();
 	msg.skip(1); // unknown
-	updateHair(c);
 	tmw.gui.charSelect.addChoice(c);
 	return c;
 }

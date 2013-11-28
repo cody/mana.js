@@ -27,7 +27,7 @@ function createCharSelectWindow() {
 	};
 
 	var choices = {};
-	var blankChar = {type: "PLAYER", equipment: {}, x: 48, y: 65, direction: 8};
+	var blankChar = {type: "PLAYER", equipment: [], x: 48, y: 65, direction: 8};
 	var selectedSlot;
 	var animationId = null;
 	var rotateNextTime = 0;
@@ -169,8 +169,7 @@ function createCharSelectWindow() {
 		}
 		selectStyle.selectedIndex = Math.random() * (selectStyle.length - 1);
 		selectStyle.onchange = function () {
-			blankChar.equipment.hairStyle = selectStyle.selectedIndex;
-			updateHair(blankChar);
+			setEquipment(blankChar, "hairStyle", selectStyle.selectedIndex);
 		}
 
 		var selectColor = document.getElementById("charCreationColor");
@@ -180,8 +179,7 @@ function createCharSelectWindow() {
 		}
 		selectColor.selectedIndex = Math.random() * (selectColor.length - 1);
 		selectColor.onchange = function () {
-			blankChar.equipment.hairColor = selectColor.selectedIndex;
-			updateHair(blankChar);
+			setEquipment(blankChar, "hairColor", selectColor.selectedIndex);
 		}
 
 		var canvas = document.createElement("canvas");
@@ -195,8 +193,8 @@ function createCharSelectWindow() {
 		tmw.context = context;
 		blankChar.sex = tmw.net.token.sex;
 		blankChar.template = tmw.playerSet[blankChar.sex ? "male" : "female"];
-		blankChar.equipment.topClothes = tmw.itemDB[1202];
-		blankChar.equipment.bottomClothes = tmw.itemDB[881];
+		setEquipment(blankChar, "topClothes", 1202);
+		setEquipment(blankChar, "bottomClothes", 881);
 		selectColor.dispatchEvent(new Event("change"));
 		selectStyle.dispatchEvent(new Event("change"));
 		animationId = window.requestAnimationFrame(runAnimationCreate);

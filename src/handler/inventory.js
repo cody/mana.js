@@ -91,7 +91,8 @@ tmw.handler.SMSG_PLAYER_EQUIPMENT = function (msg) {
 	var size = msg.getSize() / 20;
 	for (var i=0; i<size; i++) {
 		var index = msg.read16() - 2;
-		var item = tmw.itemDB[msg.read16()];
+		var id = msg.read16();
+		var item = tmw.itemDB[id];
 		msg.skip(1); // itemType
 		msg.skip(1); // identified
 		var equipType = msg.read16();
@@ -102,7 +103,7 @@ tmw.handler.SMSG_PLAYER_EQUIPMENT = function (msg) {
 		tmw.inventory[index] =
 			{item: item, amount: 1, equipType: equipType, isEquipped: Boolean(slot)};
 		if (slot)
-			tmw.localplayer.equipment[equipTypeToSlotName(slot)] = item;
+			setEquipment(tmw.localplayer, equipmentServerCode2Type(slot), id);
 	}
 	tmw.gui.inventory.draw();
 };
@@ -121,7 +122,7 @@ tmw.handler.SMSG_PLAYER_INVENTORY_USE = function (msg) {
 	msg.skip(2); // item id
 	msg.skip(4); // id
 	var amount = msg.read16();
-	msg.skip(1); // type
+	// msg.skip(1); // type
 	if (amount)
 		tmw.inventory[index].amount = amount;
 	else
@@ -161,11 +162,8 @@ tmw.handler.SMSG_PLAYER_EQUIP = function (msg) {
 		});
 		return;
 	}
-	var slot = equipTypeToSlotName(equipType);
-	if (slot)
-		tmw.localplayer.equipment[slot] = tmw.inventory[index].item;
-	else
-		console.warn("Equip index %d type %d", index, equipType);
+	var slot = equipmentServerCode2Type(equipType);
+	setEquipment(tmw.localplayer, slot, tmw.inventory[index].item.id);
 	tmw.inventory[index].isEquipped = true;
 	tmw.gui.inventory.draw();
 };
@@ -183,17 +181,13 @@ tmw.handler.SMSG_PLAYER_UNEQUIP = function (msg) {
 		});
 		return;
 	}
-	var slot = equipTypeToSlotName(equipType);
-	if (slot)
-		tmw.localplayer.equipment[slot] = null;
-	else
-		console.warn("Unequip index %d type %d", index, equipType);
+	setEquipment(tmw.localplayer, equipmentServerCode2Type(equipType), null);
 	tmw.inventory[index].isEquipped = false;
 	tmw.gui.inventory.draw();
 };
 
-function equipTypeToSlotName(equipType) {
-	switch (equipType) {
+function equipmentServerCode2Type(serverCode) {
+	switch (serverCode) {
 		case 0x001: return "bottomClothes";
 		case 0x002: return "weapon";
 		case 0x004: return "gloves";
@@ -206,7 +200,7 @@ function equipTypeToSlotName(equipType) {
 		case 0x100: return "hat";
 		case 0x200: return "topClothes";
 		case 0x8000: return "arrows";
-		default: console.error("Unknown equipType: 0x" + equipType.toString(16));
+		default: console.error("Unknown serverCode: 0x" + serverCode.toString(16));
 	}
 	return null;
 }

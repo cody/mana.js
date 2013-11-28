@@ -92,6 +92,7 @@ function loadResourceError(filename) {
 			}
 		});
 }
+
 function dye(canvas, color) {
 	var R, G, B, A;
 	var ctx = canvas.getContext("2d");
@@ -223,28 +224,10 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	top = being.y - scrollY - frames.height + 16;
 	tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
 	if (being.type === "PLAYER") {
-		var visibleEquipment = ["misc2", "shoes", "gloves", "bottomClothes",
-			"topClothes", "hair", "hat", "weapon"];
-		for (var slot in visibleEquipment) {
-			var equip = being.equipment[visibleEquipment[slot]];
-			if (!equip) continue;
-			if (equip.frames === undefined) {
-				equip.frames = null;
-				var s = null;
-				if (equip.sprite)
-					s = equip.sprite.split("|");
-				else if (being.sex === 1 && equip.spriteMale)
-					s = equip.spriteMale.split("|");
-				else if (being.sex === 0 && equip.spriteFemale)
-					s = equip.spriteFemale.split("|");
-				else
-					continue;
-				var xhr = loadXml("graphics/sprites/" + s[0], loadFrames);
-				xhr.mob = equip;
-				if (s.length === 2) xhr.color = [s[1]];
-			}
-			if (!equip.frames) continue;
-			if (!equip.frames[being.action]) continue;
+		for (var slot in being.equipment) {
+			var equip = being.equipment[slot];
+			if (!equip || !equip.frames || !equip.frames[being.action])
+				continue;
 			if (!equip.frames[being.action][being.direction]) {
 				frame = equip.frames[being.action][1][0]
 			} else {
@@ -260,36 +243,88 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	}
 }
 
-function updateHair(being) {
-	if (!being.equipment.hairStyle) {
-		being.equipment.hair = null;
+function setEquipment(being, slot, id) {
+	var sprite;
+	var index = equipmentType2Index(slot);
+	if (index === null)
 		return;
+	if (slot === "hairStyle" || slot === "hairColor") { // hair
+		being[slot] = id;
+		if (being.hairStyle === undefined || being.hairColor === undefined)
+			return;
+		if (!being.hairStyle) {
+			sprite = null;
+		} else {
+			var key = being.hairStyle + "@" + being.hairColor;
+			sprite = tmw.sprites[key];
+			if (!sprite) {
+				if (!tmw.hairStyleDB[being.hairStyle] ||
+					!tmw.hairColorDB[being.hairColor]) {
+					being.equipment[index] = null;
+					return;
+				}
+				sprite = {key: key, frames: null};
+				tmw.sprites[key] = sprite;
+				var xhr = loadXml("graphics/sprites/" +
+					tmw.hairStyleDB[being.hairStyle].sprite, loadFrames);
+				xhr.color = [tmw.hairColorDB[being.hairColor].color];
+				xhr.mob = sprite;
+			}
+		}
+	} else { // items
+		if (id) {
+			var item = tmw.itemDB[id];
+			if (!item) return;
+			var key;
+			if (item.sprite)
+				key = item.sprite;
+			else if (being.sex === 0 && item.spriteFemale)
+				key = item.spriteFemale;
+			else if (being.sex === 1 && item.spriteMale)
+				key = item.spriteMale;
+			else
+				return;
+			sprite = tmw.sprites[key];
+			if (!sprite) {
+				sprite = {key: key, frames: null};
+				if (item["attack-action"])
+					sprite["attack-action"] = item["attack-action"];
+				tmw.sprites[key] = sprite;
+				var pathAndColor = key.split("|");
+				var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
+				if (pathAndColor.length === 2)
+					xhr.color = [pathAndColor[1]];
+				xhr.mob = sprite;
+			}
+		}
 	}
-	if (!tmw.hairStyleDB[being.equipment.hairStyle]) {
-		being.equipment.hair = null;
-		return;
+	being.equipment[index] = sprite;
+}
+
+function equipmentType2Index(slot) {
+	switch (slot) { // visible equipment only
+		case "misc2": return 0;
+		case "shoes": return 1;
+		case "gloves": return 2;
+		case "bottomClothes": return 3;
+		case "topClothes": return 4;
+		case "hairStyle":
+		case "hairColor":
+		case "hair": return 5;
+		case "hat": return 6;
+		case "weapon": return 7;
+		default: return null;
 	}
-	var key = being.equipment.hairStyle + "@" + being.equipment.hairColor;
-	if (!tmw.hairDB[key]) {
-		tmw.hairDB[key] = {key: key, frames: null};
-		var xhr = loadXml("graphics/sprites/" +
-			tmw.hairStyleDB[being.equipment.hairStyle].sprite, loadFrames);
-		xhr.color = [tmw.hairColorDB[being.equipment.hairColor].color];
-		xhr.mob = tmw.hairDB[key];
-	}
-	being.equipment.hair = tmw.hairDB[key];
 }
 
 function loadFrames() {
 	var include = this.responseXML.getElementsByTagName("include")[0];
 	if (include) {
 		var path = "graphics/sprites/" + include.attributes.file.value;
-		var xhr = loadXml(path, loadFrames2);
-		xhr.imagesetXML = this;
-		xhr.color = this.color;
-		xhr.variant = this.variant;
+		var xhr = loadXml(path, loadFrames);
+		xhr.imagesetXML = this.imagesetXML ? this.imagesetXML : this;
 	} else {
-		this.imagesetXML = this;
+		if (!this.imagesetXML) this.imagesetXML = this;
 		loadFrames2.call(this);
 	}
 }
@@ -298,8 +333,8 @@ function loadFrames2() {
 	var imageset = this.imagesetXML.responseXML.getElementsByTagName("imageset")[0];
 	var srcArray = imageset.attributes.src.value.split("|");
 	if (srcArray.length === 2) {
-		if (!this.color) this.color = [];
-		this.color.push(srcArray[1]);
+		if (!this.imagesetXML.color) this.imagesetXML.color = [];
+		this.imagesetXML.color.push(srcArray[1]);
 	}
 	var png = loadPng(srcArray[0], readFrames);
 	this.mob = this.imagesetXML.mob;
@@ -308,7 +343,7 @@ function loadFrames2() {
 	png.frameHeight = Number(imageset.attributes.height.value);
 	png.baseOffsetX = imageset.attributes.offsetXS ? Number(imageset.attributes.offsetX.value) : 0;
 	png.baseOffsetY = imageset.attributes.offsetY ? Number(imageset.attributes.offsetY.value) : 0;
-	png.variant = this.variant;
+	png.variant = this.imagesetXML.variant;
 }
 
 function readFrames() {
@@ -369,7 +404,7 @@ function readFrames() {
 		canvas.height = png.frameHeight;
 		var ctx = canvas.getContext("2d");
 		ctx.drawImage(png, left, top, png.frameWidth, png.frameHeight, 0, 0 , png.frameWidth, png.frameHeight);
-		if (png.xml.color) dye(canvas, png.xml.color);
+		if (png.xml.imagesetXML.color) dye(canvas, png.xml.imagesetXML.color);
 		frames.push({canvas: canvas, delay: delay, offsetX: offsetX, offsetY: offsetY});
 	}
 }

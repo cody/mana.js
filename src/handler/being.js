@@ -22,7 +22,7 @@
 function createBeing(being) {
 	being.action = "stand";
 	being.direction = 1;
-	being.equipment = {};
+	being.equipment = [];
 	being.movePixelPath = [];
 	being.damageTaken = 0;
 	var job = being.job;
@@ -83,14 +83,15 @@ function processPlayerPacket(msg, msgType) {
 		if (!createBeing(being)) return;
 	}
 	// Todo: Check if being is a member of localplayer's party
-	being.equipment.hairStyle = msg.read16();
-	being.equipment.weapon = tmw.itemDB[msg.read16()];
-	being.equipment.shield = tmw.itemDB[msg.read16()];
-	being.equipment.bottomClothes = tmw.itemDB[msg.read16()];
+	var equipment = [];
+	setEquipment(being, "hairStyle", msg.read16());
+	equipment.push(["weapon", msg.read16()]);
+	equipment.push(["shield", msg.read16()]);
+	equipment.push(["bottomClothes", msg.read16()]);
 	if (msgType === "SMSG_PLAYER_MOVE") msg.skip(4); // server tick
-	being.equipment.hat = tmw.itemDB[msg.read16()];
-	being.equipment.topClothes = tmw.itemDB[msg.read16()];
-	being.equipment.hairColor = msg.read16();
+	equipment.push(["hat", msg.read16()]);
+	equipment.push(["topClothes", msg.read16()]);
+	setEquipment(being, "hairColor", msg.read16());
 	msg.skip(2); // shoes
 	msg.skip(2); // gloves
 	msg.skip(4); // guild
@@ -100,6 +101,8 @@ function processPlayerPacket(msg, msgType) {
 	msg.skip(1); // karma
 	being.sex = msg.read8();
 	being.template = tmw.playerSet[being.sex ? "male" : "female"];
+	for (var i in equipment)
+		setEquipment(being, equipment[i][0], equipment[i][1]);
 	if (msgType === "SMSG_PLAYER_MOVE") {
 		var coord = msg.readCoordinatePair();
 		tmw.path.findPath(being, coord.srcX, coord.srcY, coord.dstX, coord.dstY);
@@ -127,12 +130,11 @@ function processPlayerPacket(msg, msgType) {
 			default: console.error("Ignoring action "+action+" for being "+id+" "+being.name);
 		}
 		being.sprite = null;
-	} else if (msgType === "SMSG_PLAYER_MOVE") {
+	} /* else if (msgType === "SMSG_PLAYER_MOVE") {
 		msg.skip(1);
 	}
 	msg.skip(1); // Lv
-	msg.skip(1);
-	updateHair(being);
+	msg.skip(1); */
 }
 
 tmw.handler.SMSG_BEING_NAME_RESPONSE = function (msg) {
@@ -164,28 +166,28 @@ tmw.handler.SMSG_BEING_REMOVE = function (msg) {
 
 tmw.handler.SMSG_BEING_CHANGE_LOOKS2 = function (msg) {
 	var id = msg.read32();
-	var being = id === tmw.localplayer.id ? tmw.localplayer : tmw.beings[id];
+	var being = tmw.beings[id];
 	if (!being) return;
 	var slot = msg.read8();
 	var id = msg.read16();
 	switch (slot) {
-		case 1: being.equipment.hairStyle = id; updateHair(being); break;
+		case 1: setEquipment(being, "hairStyle", id); break;
 		case 2:
-			being.equipment.weapon = tmw.itemDB[id];
-			being.equipment.shield = tmw.itemDB[msg.read16()];
+			setEquipment(being, "weapon", id);
+			setEquipment(being, "shield", msg.read16());
 			break;
-		case 3: being.equipment.bottomClothes = tmw.itemDB[id]; break;
-		case 4: being.equipment.hat = tmw.itemDB[id]; break;
-		case 5: being.equipment.topClothes = tmw.itemDB[id]; break;
-		case 6: being.equipment.hairColor = id; updateHair(being); break;
+		case 3: setEquipment(being, "bottomClothes", id); break;
+		case 4: setEquipment(being, "hat", id); break;
+		case 5: setEquipment(being, "topClothes", id); break;
+		case 6: setEquipment(being, "hairColor", id); break;
 		case 7: break; // clothes color
-		case 8: being.equipment.shield = tmw.itemDB[id]; break;
-		case 9: being.equipment.shoes = tmw.itemDB[id]; break;
-		case 10: being.equipment.gloves = tmw.itemDB[id]; break;
-		case 11: being.equipment.cape = tmw.itemDB[id]; break;
-		case 12: being.equipment.misc1 = tmw.itemDB[id]; break;
-		case 13: being.equipment.misc2 = tmw.itemDB[id]; break;
-		default: console.error("SMSG_BEING_CHANGE_LOOKS2: unsupported slot: %d, id: %d", slot, id); break;
+		case 8: setEquipment(being, "shield", id); break;
+		case 9: setEquipment(being, "shoes", id); break;
+		case 10: setEquipment(being, "gloves", id); break;
+		case 11: setEquipment(being, "cape", id); break;
+		case 12: setEquipment(being, "misc1", id); break;
+		case 13: setEquipment(being, "misc2", id); break;
+		default: console.error("SMSG_BEING_CHANGE_LOOKS2: unsupported slot: %d, id: %d", slot, id);
 	}
 };
 
@@ -216,16 +218,16 @@ function processBeingPacket(msg, msgType) {
 		}
 		if (!createBeing(being)) return;
 	}
-	being.hairStyle = msg.read16();
-	being.equipment.weapon = tmw.itemDB[msg.read16()];
-	being.equipment.bottomClothes = tmw.itemDB[msg.read16()];
+	msg.skip(2); // hairStyle
+	msg.skip(2); // weapon
+	msg.skip(2); // bottomClothes
 	if (msgType === "SMSG_BEING_MOVE") msg.skip(4); // server tick
-	being.equipment.shield = tmw.itemDB[msg.read16()];
-	being.equipment.hat = tmw.itemDB[msg.read16()];
-	being.equipment.topClothes = tmw.itemDB[msg.read16()];
-	being.equipment.hairColor = msg.read16();
-	being.equipment.shoes = tmw.itemDB[msg.read16()];
-	being.equipment.gloves = tmw.itemDB[msg.read16()];
+	msg.skip(2); // shield
+	msg.skip(2); // hat
+	msg.skip(2); // topClothes
+	msg.skip(2); // hairColor
+	msg.skip(2); // shoes
+	msg.skip(2); // gloves
 	being.guild = msg.read32();
 	msg.skip(2); // guild emblem
 	msg.skip(2); // manner
@@ -252,7 +254,6 @@ function processBeingPacket(msg, msgType) {
 	msg.skip(1);
 	msg.skip(1);
 	msg.skip(1);
-	updateHair(being);
 }
 
 tmw.handler.SMSG_BEING_SPAWN = function (msg) {
@@ -334,8 +335,9 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 			});
 			if (srcBeing && !srcBeing.movePixelPath.length &&
 				srcBeing.action.indexOf("attack") !== 0) {
-				srcBeing.action = srcBeing.equipment.weapon ?
-					srcBeing.equipment.weapon["attack-action"]: "attack";
+				var slot = equipmentType2Index("weapon");
+				srcBeing.action = srcBeing.equipment[slot] ?
+					srcBeing.equipment[slot]["attack-action"]: "attack";
 				srcBeing.sprite = null;
 			}
 			break;

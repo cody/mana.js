@@ -72,9 +72,10 @@ function createLoop() {
 				if (selected && selected.type !== "NPC") {
 					if (tmw.net.packetLimiter("CMSG_PLAYER_ATTACK")) {
 						if (tmw.localplayer.action.indexOf("attack") !== 0) {
+							var slot = equipmentType2Index("weapon");
 							tmw.localplayer.action =
-								tmw.localplayer.equipment.weapon ?
-								tmw.localplayer.equipment.weapon["attack-action"]:
+								tmw.localplayer.equipment[slot] ?
+								tmw.localplayer.equipment[slot]["attack-action"]:
 								"attack";
 							tmw.localplayer.sprite = null;
 						}
