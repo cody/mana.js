@@ -25,7 +25,6 @@ tmw.handler.SMSG_SERVER_VERSION_RESPONSE = function (msg) {
 	msg.skip(1); // revision ('M')
 	msg.skip(1); // release ('W')
 	var official = msg.read8(); // 0 = registation disabled, 1 = enabled
-	console.log("Registration: " + (official ? "enabled" : "disabled"));
 	tmw.gui.login.registrationEnabled(official);
 	// msg.skip(1); // which
 	// msg.skip(2); // mod version

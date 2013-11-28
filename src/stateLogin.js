@@ -84,7 +84,7 @@ function stateLogin() {
 			console.log("Server: " + host + ", Port: " + port + ", Account: " + name);
 			tmw.net.loginData = {name: name, password: password, character: character};
 			tmw.state.set("STATE_LOGIN_ATTEMPT", {server: host, port: port});})
-		.button();
+		.button({disabled: true});
 	$("#loginForm").dialog({width: 280, dialogClass: "no-close"});
 
 	$("#loginVersion")
@@ -138,7 +138,7 @@ function stateLogin() {
 		var titel = serverList[serverListIndex].name === "The Mana World" ?
 			"Login" : "Login (" + serverList[serverListIndex].name + ")";
 		$("#loginForm").dialog("option", "title", titel);
-		document.getElementById("signUp").innerHTML = "";
+		document.getElementById("signUp").innerHTML = "Connecting...";
 		$("#formName").attr("value", serverList[serverListIndex].account);
 		$("#formPassword").attr("value", serverList[serverListIndex].password);
 		if (!serverList[serverListIndex].account)
@@ -147,12 +147,15 @@ function stateLogin() {
 			document.getElementById("formPassword").focus();
 		else
 			document.getElementById("connectButton").focus();
+		$("#connectButton").button("option", "disabled", true);
 		tmw.net.connect({server: serverList[serverListIndex].hostname,
 			port: serverList[serverListIndex].port}, false,
 			function () {
+				$("#connectButton").button("option", "disabled", false);
 				newOutgoingMessage("CMSG_SERVER_VERSION_REQUEST").send();
 			},
 			function (result) {
+				$("#connectButton").button("option", "disabled", false);
 				document.getElementById("signUp").innerHTML =
 					"<span style='color:Red'>" + result + "</span>";
 			});
@@ -193,13 +196,13 @@ function stateLogin() {
 		if (isEnabled) {
 			link.innerText = "Register";
 			link.onclick = openSignUpWindow;
-			div.appendChild(link);
+			div.innerHTML = link.outerHTML;
 		} else {
 			if (serverList[serverListIndex].signUp) {
 				link.href = serverList[serverListIndex].signUp;
 				link.target = "_blank";
 				link.innerText = "Sign-up";
-				div.appendChild(link);
+				div.innerHTML = link.outerHTML;
 			} else {
 				div.innerHTML = "<span style='color:Blue'>Registration disabled</span>";
 			}
