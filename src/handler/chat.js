@@ -40,6 +40,10 @@ tmw.handler.SMSG_PLAYER_CHAT = function (msg) {
 		name = text.slice(0, index);
 		text = text.slice(index + 3);
 	}
+	if (!tmw.gui.chat) { // "Invisible: On." is send during STATE_CONNECT_GAME
+		console.log("Localplayer says: " + text);
+		return;
+	}
 	tmw.gui.chat.log(name, text, "player");
 	tmw.localplayer.speechText = text;
 	tmw.localplayer.speechTimeout =
