@@ -36,7 +36,7 @@ function createBeing(being) {
 			if (npc.sprites[0]) {
 				var sprite = npc.sprites[0].path.split("|");
 				var xhr = loadXml("graphics/sprites/" + sprite[0], loadFrames);
-				xhr.mob = npc;
+				xhr.actor = npc;
 				if (sprite.length === 2) xhr.color = [sprite[1]];
 				xhr.variant = npc.sprites[0].variant;
 			}
@@ -49,7 +49,7 @@ function createBeing(being) {
 			monster.frames = null;
 			var sprite = monster.sprites[0].split("|");
 			var xhr = loadXml("graphics/sprites/" + sprite[0], loadFrames);
-			xhr.mob = monster;
+			xhr.actor = monster;
 			if (sprite.length === 2) xhr.color = [sprite[1]];
 		}
 		being.template = monster;

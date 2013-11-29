@@ -268,7 +268,7 @@ function setEquipment(being, slot, id) {
 				var xhr = loadXml("graphics/sprites/" +
 					tmw.hairStyleDB[being.hairStyle].sprite, loadFrames);
 				xhr.color = [tmw.hairColorDB[being.hairColor].color];
-				xhr.mob = sprite;
+				xhr.actor = sprite;
 			}
 		}
 	} else { // items
@@ -294,7 +294,7 @@ function setEquipment(being, slot, id) {
 				var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
 				if (pathAndColor.length === 2)
 					xhr.color = [pathAndColor[1]];
-				xhr.mob = sprite;
+				xhr.actor = sprite;
 			}
 		}
 	}
@@ -337,7 +337,7 @@ function loadFrames2() {
 		this.imagesetXML.color.push(srcArray[1]);
 	}
 	var png = loadPng(srcArray[0], readFrames);
-	this.mob = this.imagesetXML.mob;
+	this.actor = this.imagesetXML.actor;
 	png.xml = this;
 	png.frameWidth = Number(imageset.attributes.width.value);
 	png.frameHeight = Number(imageset.attributes.height.value);
@@ -347,16 +347,15 @@ function loadFrames2() {
 }
 
 function readFrames() {
-	console.assert(this.xml.mob.frames === null);
-	this.xml.mob.frames = {};
+	this.xml.actor.frames = {};
 	var index, end, offsetX, offsetY, delay;
 	var imageset = this.xml.responseXML.getElementsByTagName("imageset")[0];
-	this.xml.mob.frames.width = imageset.attributes.width.value;
-	this.xml.mob.frames.height = imageset.attributes.height.value;
+	this.xml.actor.frames.width = imageset.attributes.width.value;
+	this.xml.actor.frames.height = imageset.attributes.height.value;
 	var actions = this.xml.responseXML.getElementsByTagName("action");
 	for (var i=0; i<actions.length; i++) {
 		var actionObj = {};
-		this.xml.mob.frames[actions[i].attributes["name"].value] = actionObj;
+		this.xml.actor.frames[actions[i].attributes["name"].value] = actionObj;
 		var animations = actions[i].getElementsByTagName("animation");
 		for (var j=0; j<animations.length; j++) {
 			var dir;
