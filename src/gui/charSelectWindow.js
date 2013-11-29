@@ -169,7 +169,7 @@ function createCharSelectWindow() {
 		}
 		selectStyle.selectedIndex = Math.random() * (selectStyle.length - 1);
 		selectStyle.onchange = function () {
-			setEquipment(blankChar, "hairStyle", selectStyle.selectedIndex);
+			setHair(blankChar, "hairStyle", selectStyle.selectedIndex);
 		}
 
 		var selectColor = document.getElementById("charCreationColor");
@@ -179,7 +179,7 @@ function createCharSelectWindow() {
 		}
 		selectColor.selectedIndex = Math.random() * (selectColor.length - 1);
 		selectColor.onchange = function () {
-			setEquipment(blankChar, "hairColor", selectColor.selectedIndex);
+			setHair(blankChar, "hairColor", selectColor.selectedIndex);
 		}
 
 		var canvas = document.createElement("canvas");

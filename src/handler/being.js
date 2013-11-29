@@ -88,14 +88,14 @@ function processPlayerPacket(msg, msgType) {
 	}
 	// Todo: Check if being is a member of localplayer's party
 	var equipment = [];
-	setEquipment(being, "hairStyle", msg.read16());
+	setHair(being, "hairStyle", msg.read16());
 	equipment.push(["weapon", msg.read16()]);
 	equipment.push(["shield", msg.read16()]);
 	equipment.push(["bottomClothes", msg.read16()]);
 	if (msgType === "SMSG_PLAYER_MOVE") msg.skip(4); // server tick
 	equipment.push(["hat", msg.read16()]);
 	equipment.push(["topClothes", msg.read16()]);
-	setEquipment(being, "hairColor", msg.read16());
+	setHair(being, "hairColor", msg.read16());
 	msg.skip(2); // shoes
 	msg.skip(2); // gloves
 	msg.skip(4); // guild
@@ -175,7 +175,7 @@ tmw.handler.SMSG_BEING_CHANGE_LOOKS2 = function (msg) {
 	var slot = msg.read8();
 	var id = msg.read16();
 	switch (slot) {
-		case 1: setEquipment(being, "hairStyle", id); break;
+		case 1: setHair(being, "hairStyle", id); break;
 		case 2:
 			setEquipment(being, "weapon", id);
 			setEquipment(being, "shield", msg.read16());
@@ -183,7 +183,7 @@ tmw.handler.SMSG_BEING_CHANGE_LOOKS2 = function (msg) {
 		case 3: setEquipment(being, "bottomClothes", id); break;
 		case 4: setEquipment(being, "hat", id); break;
 		case 5: setEquipment(being, "topClothes", id); break;
-		case 6: setEquipment(being, "hairColor", id); break;
+		case 6: setHair(being, "hairColor", id); break;
 		case 7: break; // clothes color
 		case 8: setEquipment(being, "shield", id); break;
 		case 9: setEquipment(being, "shoes", id); break;

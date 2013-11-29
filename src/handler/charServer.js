@@ -46,7 +46,7 @@ function readCharacterData(msg) {
 	c.attributes.mpMax = msg.read16();
 	msg.skip(2); // speed
 	c.race = msg.read16();
-	setEquipment(c, "hairStyle", msg.read16());
+	setHair(c, "hairStyle", msg.read16());
 	setEquipment(c, "weapon", msg.read16());
 	c.attributes.level = msg.read16();
 	msg.skip(2); // skill point
@@ -54,7 +54,7 @@ function readCharacterData(msg) {
 	setEquipment(c, "shield", msg.read16());
 	setEquipment(c, "hat", msg.read16());
 	setEquipment(c, "topClothes", msg.read16());
-	setEquipment(c, "hairColor", msg.read16());
+	setHair(c, "hairColor", msg.read16());
 	setEquipment(c, "misc2", msg.read16());
 	c.nameInsecure = msg.readString(24);
 	c.name = htmlToText(c.nameInsecure);

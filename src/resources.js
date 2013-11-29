@@ -241,59 +241,61 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	}
 }
 
+function setHair(being, slot, id) {
+	var sprite = null;
+	var index = equipmentType2Index("hair");
+	being[slot] = id;
+	if (!tmw.hairStyleDB[being.hairStyle] || !tmw.hairColorDB[being.hairColor])
+		return;
+	if (being.hairStyle) {
+		var style = tmw.hairStyleDB[being.hairStyle].sprite;
+		var color = tmw.hairColorDB[being.hairColor].color;
+		var key = style + "|" + color;
+		sprite = tmw.sprites[key];
+		if (!sprite) {
+			if (!tmw.hairStyleDB[being.hairStyle] ||
+				!tmw.hairColorDB[being.hairColor]) {
+				being.equipment[index] = null;
+				return;
+			}
+			sprite = {key: key, frames: null};
+			tmw.sprites[key] = sprite;
+			var xhr = loadXml("graphics/sprites/" + style, loadFrames);
+			xhr.color = [color];
+			xhr.actor = sprite;
+		}
+	}
+	being.equipment[index] = sprite;
+}
+
 function setEquipment(being, slot, id) {
-	var sprite;
+	var sprite = null;
 	var index = equipmentType2Index(slot);
 	if (index === null)
 		return;
-	if (slot === "hairStyle" || slot === "hairColor") { // hair
-		being[slot] = id;
-		if (being.hairStyle === undefined || being.hairColor === undefined)
+	if (id) {
+		var item = tmw.itemDB[id];
+		if (!item) return;
+		var key;
+		if (item.sprite)
+			key = item.sprite;
+		else if (being.sex === 0 && item.spriteFemale)
+			key = item.spriteFemale;
+		else if (being.sex === 1 && item.spriteMale)
+			key = item.spriteMale;
+		else
 			return;
-		if (!being.hairStyle) {
-			sprite = null;
-		} else {
-			var key = being.hairStyle + "@" + being.hairColor;
-			sprite = tmw.sprites[key];
-			if (!sprite) {
-				if (!tmw.hairStyleDB[being.hairStyle] ||
-					!tmw.hairColorDB[being.hairColor]) {
-					being.equipment[index] = null;
-					return;
-				}
-				sprite = {key: key, frames: null};
-				tmw.sprites[key] = sprite;
-				var xhr = loadXml("graphics/sprites/" +
-					tmw.hairStyleDB[being.hairStyle].sprite, loadFrames);
-				xhr.color = [tmw.hairColorDB[being.hairColor].color];
-				xhr.actor = sprite;
-			}
-		}
-	} else { // items
-		if (id) {
-			var item = tmw.itemDB[id];
-			if (!item) return;
-			var key;
-			if (item.sprite)
-				key = item.sprite;
-			else if (being.sex === 0 && item.spriteFemale)
-				key = item.spriteFemale;
-			else if (being.sex === 1 && item.spriteMale)
-				key = item.spriteMale;
-			else
-				return;
-			sprite = tmw.sprites[key];
-			if (!sprite) {
-				sprite = {key: key, frames: null};
-				if (item["attack-action"])
-					sprite["attack-action"] = item["attack-action"];
-				tmw.sprites[key] = sprite;
-				var pathAndColor = key.split("|");
-				var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
-				if (pathAndColor.length === 2)
-					xhr.color = [pathAndColor[1]];
-				xhr.actor = sprite;
-			}
+		sprite = tmw.sprites[key];
+		if (!sprite) {
+			sprite = {key: key, frames: null};
+			if (item["attack-action"])
+				sprite["attack-action"] = item["attack-action"];
+			tmw.sprites[key] = sprite;
+			var pathAndColor = key.split("|");
+			var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
+			if (pathAndColor.length === 2)
+				xhr.color = [pathAndColor[1]];
+			xhr.actor = sprite;
 		}
 	}
 	being.equipment[index] = sprite;
@@ -320,8 +322,6 @@ function equipmentType2Index(slot) {
 		case "gloves": return 2;
 		case "bottomClothes": return 3;
 		case "topClothes": return 4;
-		case "hairStyle":
-		case "hairColor":
 		case "hair": return 5;
 		case "hat": return 6;
 		case "weapon": return 7;
