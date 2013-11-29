@@ -223,23 +223,21 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	left = being.x - scrollX - Math.floor(frames.width / 2);
 	top = being.y - scrollY - frames.height + 16;
 	tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
-	if (being.type === "PLAYER") {
-		for (var slot in being.equipment) {
-			var equip = being.equipment[slot];
-			if (!equip || !equip.frames || !equip.frames[being.action])
-				continue;
-			if (!equip.frames[being.action][being.direction]) {
-				frame = equip.frames[being.action][1][0]
-			} else {
-				frame = equip.frames[being.action][being.direction][being.spriteIndex];
-				if (!frame)
-					frame = equip.frames[being.action][being.direction][0];
-			}
-			left = being.x - scrollX - Math.floor(equip.frames.width / 2);
-			top = being.y - scrollY - equip.frames.height + 16;
-			if (frame) // Remove for testing
-				tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
+	for (var slot in being.equipment) {
+		var equip = being.equipment[slot];
+		if (!equip || !equip.frames || !equip.frames[being.action])
+			continue;
+		if (!equip.frames[being.action][being.direction]) {
+			frame = equip.frames[being.action][1][0]
+		} else {
+			frame = equip.frames[being.action][being.direction][being.spriteIndex];
+			if (!frame)
+				frame = equip.frames[being.action][being.direction][0];
 		}
+		left = being.x - scrollX - Math.floor(equip.frames.width / 2);
+		top = being.y - scrollY - equip.frames.height + 16;
+		if (frame) // Remove for testing
+			tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
 	}
 }
 
@@ -299,6 +297,20 @@ function setEquipment(being, slot, id) {
 		}
 	}
 	being.equipment[index] = sprite;
+}
+
+function setAccessories(being, key) {
+	var sprite = tmw.sprites[key];
+	if (!sprite) {
+		sprite = {key: key, frames: null};
+		tmw.sprites[key] = sprite;
+		var pathAndColor = key.split("|");
+		var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
+		if (pathAndColor.length === 2)
+			xhr.color = [pathAndColor[1]];
+		xhr.actor = sprite;
+	}
+	being.equipment.push(sprite);
 }
 
 function equipmentType2Index(slot) {

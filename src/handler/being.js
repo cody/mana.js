@@ -41,6 +41,8 @@ function createBeing(being) {
 				xhr.variant = npc.sprites[0].variant;
 			}
 		}
+		for (var i=1; i<npc.sprites.length; i++)
+			setAccessories(being, npc.sprites[i].path);
 		being.template = npc;
 	} else if (job > 1000 && job <= 2000) {
 		being.type = "MONSTER";
@@ -53,6 +55,8 @@ function createBeing(being) {
 			if (sprite.length === 2) xhr.color = [sprite[1]];
 		}
 		being.template = monster;
+		for (var i=1; i<monster.sprites.length; i++)
+			setAccessories(being, monster.sprites[i]);
 	} else if (job === 45) {
 		return false; // Skip portals
 	} else {
