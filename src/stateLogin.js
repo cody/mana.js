@@ -139,8 +139,10 @@ function stateLogin() {
 			"Login" : "Login (" + serverList[serverListIndex].name + ")";
 		$("#loginForm").dialog("option", "title", titel);
 		document.getElementById("signUp").innerHTML = "Connecting...";
-		$("#formName").attr("value", serverList[serverListIndex].account);
-		$("#formPassword").attr("value", serverList[serverListIndex].password);
+		document.getElementById("formName").value =
+			serverList[serverListIndex].account || "";
+		document.getElementById("formPassword").value =
+			serverList[serverListIndex].password || "";
 		if (!serverList[serverListIndex].account)
 			document.getElementById("formName").focus();
 		else if (!serverList[serverListIndex].password)

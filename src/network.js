@@ -66,9 +66,7 @@ function createNetwork() {
 		port = o.port;
 		chrome.socket.create('tcp', {}, function(createInfo) {
 			socketId = Number(createInfo.socketId);
-			chrome.runtime.getBackgroundPage(function(backgroundPage){
-				backgroundPage.copyOfSocketId = socketId;
-			});
+			chrome.storage.local.set({socketId: socketId});
 			console.log("Network: Connecting to " + o.server + ":" + o.port + " with sockedId " + socketId);
 			chrome.socket.connect(socketId, o.server, o.port, function (result) {
 				if (result < 0) {

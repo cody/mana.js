@@ -19,6 +19,7 @@
 		{"socket": ["tcp-connect"]},
 		"unlimitedStorage",
 		"<all_urls>",
-		{"fileSystem": ["directory", "retainEntries"]}
+		{"fileSystem": ["directory", "retainEntries"]},
+		"storage"
 	]
 }

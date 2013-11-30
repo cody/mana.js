@@ -19,8 +19,6 @@
 
 "use strict";
 
-var copyOfSocketId = null;
-
 chrome.app.runtime.onLaunched.addListener(function() {
   chrome.app.window.create('window.html', {
     'bounds': {
@@ -31,14 +29,10 @@ chrome.app.runtime.onLaunched.addListener(function() {
 );
 
 function onInitWindow(appWindow) {
-	// Todo
 	appWindow.onClosed.addListener(function(){
-		if (copyOfSocketId === null) {
-			return;
-		} else if (copyOfSocketId) {
-			chrome.socket.disconnect(copyOfSocketId);
-		} else { // undefined
-			for (var i=0; i<1000; i++) chrome.socket.disconnect(i);
-		}
-  });
+		chrome.storage.local.get("socketId", function (result) {
+			if (result.socketId)
+				chrome.socket.disconnect(result.socketId);
+		});
+	});
 }
