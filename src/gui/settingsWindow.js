@@ -21,34 +21,102 @@
 
 function createSettingsWindow() {
 	tmw.gui.settings = {
-		toggle: function () {
-			win.dialog("isOpen") ? win.dialog("close") : win.dialog("open");
-		},
+		toggle: toggle,
 	};
 
-	var win = $("<div>")
-		.attr("id", "settingsWindow")
-		.attr("title", "Settings")
-		.html("<form id='settingsForm'>" +
-			"<input type='checkbox' id='mapRasterCheckbox'>" +
-			"<label for='mapRasterCheckbox'>Map raster</label><br>" +
-			"<input type='checkbox' id='collisionCheckbox'>" +
-			"<label for='collisionCheckbox'>Collision tiles</label><br>" +
-			"<input type='checkbox' id='showFpsCheckbox'>" +
-			"<label for='showFpsCheckbox'>Show FPS</label>" +
-			"</form>")
-		.appendTo("#game")
-		.dialog({autoOpen: false, closeOnEscape: false});
+	var isOpen = false;
+	var win = null;
+	var content;
 
-	$("#mapRasterCheckbox").change(function () {
-		tmw.config.debugRaster = document.getElementById("mapRasterCheckbox").checked;});
+	function buildWindow() {
+		win = document.createElement("div");
+		win.style.position = "absolute";
+		win.style.right = "3px";
+		win.style.top = "26px";
+		win.style.width = "300px";
+		win.style.height = "300px";
+		win.style.fontSize = "12pt";
+		win.style.background = "Bisque";
+		win.innerHTML =
+			"<div id='settingsWindowTitle' style='background:Turquoise'>" +
+			"<span style='margin:4px;'>Settings</span><span " +
+			"id='settingsClose' class='ui-icon ui-icon-close' style='float:right'>" +
+			"</span></div><div id='settingsMenuBar'>" +
+			"<button id='settingsDebugRadio'>Debug</button>" +
+			"<button id='settingsKeyboardRadio'>Keyboard</button>" +
+			"</div> <div  id='settingsContentContainer' " +
+			"style='position:absolute; width:100%; bottom:0px; overflow:auto;'>" +
+			"<div id='settingsContent' style='padding:3px;'></div>";
+		document.getElementById("game").appendChild(win);
+		document.getElementById("settingsClose").onclick = toggle;
+		document.getElementById("settingsContentContainer").style.top =
+			document.getElementById("settingsMenuBar").getBoundingClientRect().height +
+			document.getElementById("settingsWindowTitle").getBoundingClientRect().height +
+			"px";
+		$(win)
+			.draggable({handle: "#settingsWindowTitle", containment: "#game"})
+			.resizable({resize: $.noop, containment: "#game",
+				minWidth: 200, minHeight: 150});
+		document.getElementById("settingsDebugRadio").onclick = showDebug;
+		document.getElementById("settingsKeyboardRadio").onclick = showKeyboard;
+		content = document.getElementById("settingsContent");
+		showDebug();
+	}
 
-	$("#collisionCheckbox").change(function () {
-		tmw.config.debugCollision = document.getElementById("collisionCheckbox").checked;});
+	function toggle() {
+		if (isOpen)
+			document.getElementById("game").removeChild(win);
+		else if (win)
+			document.getElementById("game").appendChild(win);
+		else
+			buildWindow();
+		isOpen = !isOpen;
+	}
 
-	$("#showFpsCheckbox").change(function () {
-		var value = document.getElementById("showFpsCheckbox").checked;
-		tmw.config.showFps = value;
-		value ? $("#fps").show() : $("#fps").hide();
-	});
+	function showDebug() {
+		document.getElementById("settingsDebugRadio").style.background = "Turquoise";
+		document.getElementById("settingsKeyboardRadio").style.background = "White";
+		content.innerHTML =
+			"<form id='settingsForm'>" +
+			"<label><input type='checkbox' id='showFps'>Show FPS</label><br>" +
+			"<label><input type='checkbox' id='debugCollision'>Collision tiles</label><br>" +
+			"<label><input type='checkbox' id='debugRaster'>Map raster</label>" +
+			"</form>";
+		document.getElementById("showFps").checked = tmw.config.showFps;
+		document.getElementById("debugCollision").checked = tmw.config.debugCollision;
+		document.getElementById("debugRaster").checked = tmw.config.debugRaster;
+		document.getElementById("settingsForm").onchange = function (event) {
+			var id = event.target.id;
+			var value = event.target.checked;
+			tmw.config[id] = value;
+			if (id === "showFps")
+				value ? $("#fps").show() : $("#fps").hide();
+		};
+	}
+
+	function showKeyboard() {
+		document.getElementById("settingsDebugRadio").style.background = "White";
+		document.getElementById("settingsKeyboardRadio").style.background = "Turquoise";
+		content.innerHTML = "<table>" +
+			"<tr><td>Arrows</td><td>Move</td></tr>" +
+			"<tr><td>x</td><td>Attack</td></tr>" +
+			"<tr><td>y or z</td><td>Pick-up item</td></tr>" +
+			"<tr><td>a</td><td>Select Monster</td></tr>" +
+			"<tr><td>n</td><td>Select NPC</td></tr>" +
+			"<tr><td>q</td><td>Select Player</td></tr>" +
+			"<tr><td>ctrl</td><td>Deselect</td></tr>" +
+			"<tr><td>t</td><td>Talk to selected NPC or open wisper tab for selected player</td></tr>" +
+			"<tr><td>s</td><td>Sit</td></tr>" +
+			"<tr><td>Enter</td><td>Chat input</td></tr>" +
+			"<tr><td>Alt+0...Alt+9</td><td>Show emotes</td></tr>" +
+			"<tr><td>Alt+arrow</td><td>Change direction</td></tr>" +
+			"<tr><td>F2</td><td>Status window</td></tr>" +
+			"<tr><td>F3</td><td>Inventory window</td></tr>" +
+			"<tr><td>F5</td><td>Skills window</td></tr>" +
+			"<tr><td>F7</td><td>Chat window</td></tr>" +
+			"<tr><td>F9</td><td>Settings window</td></tr>" +
+			"<tr><td>F11</td><td>Social window</td></tr>" +
+			"<tr><td>F12</td><td>Emote window</td></tr>" +
+			"</table>";
+	}
 }
