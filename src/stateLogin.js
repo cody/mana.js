@@ -197,8 +197,8 @@ function stateLogin() {
 		link.style.textDecoration = "none";
 		if (isEnabled) {
 			link.innerText = "Register";
-			link.onclick = openSignUpWindow;
 			div.innerHTML = link.outerHTML;
+			div.onclick = openSignUpWindow;
 		} else {
 			if (serverList[serverListIndex].signUp) {
 				link.href = serverList[serverListIndex].signUp;
@@ -350,7 +350,7 @@ function stateLogin() {
 			"<tr><td></td><td><form><label><input type='radio' id='male' name='sex' checked>Male</input></label>" +
 			"<label><input type='radio' id='female' name='sex'>Female</input></label></form></td>" +
 			"<tr><td></td><td><span style='float:right'>" +
-			"<button id='cancel'>Cancel</button>" +
+			"<button id='cancelSignUp'>Cancel</button>" +
 			"<button id='register'>Register</button>" +
 			"</span></td></tr></table>";
 		var rect = div.getBoundingClientRect();
@@ -359,7 +359,7 @@ function stateLogin() {
 		div.style.fontSize = "12pt";
 		document.getElementById("male").onchange = function () { sex = "_M"; };
 		document.getElementById("female").onchange = function () { sex = "_F"; };
-		document.getElementById("cancel").onclick = function () {
+		document.getElementById("cancelSignUp").onclick = function () {
 			div.parentNode.removeChild(div);
 			$("#loginForm").dialog("open");
 		};
