@@ -33,7 +33,8 @@ tmw.handler.SMSG_PLAYER_ARROW_MESSAGE = function (msg) {
 			text: "Equip arrows first.",
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "red"
+			color: "Red",
+			outline: "White",
 		});
 	}
 };
@@ -158,7 +159,8 @@ tmw.handler.SMSG_PLAYER_STAT_UPDATE_2 = function (msg) {
 					text: diff + "xp",
 					timeout: tmw.timeAnimation + 4000,
 					being: tmw.localplayer,
-					color: "blue"
+					color: "Blue",
+					outline: "White",
 				});
 			}
 			tmw.gui.gui.setXp();

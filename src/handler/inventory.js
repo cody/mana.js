@@ -47,7 +47,8 @@ tmw.handler.SMSG_PLAYER_INVENTORY_ADD = function (msg) {
 			text: text,
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "red"
+			color: "Red",
+			outline: "White",
 		});
 	} else {
 		var text = amount > 1 ? (amount + " " + item.name) : item.name;
@@ -55,7 +56,8 @@ tmw.handler.SMSG_PLAYER_INVENTORY_ADD = function (msg) {
 			text: text,
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "black"
+			color: "Black",
+			outline: "White",
 		});
 		var inventoryEntry = tmw.inventory[index];
 		if  (inventoryEntry && inventoryEntry.item === item)
@@ -138,7 +140,8 @@ tmw.handler.SMSG_ITEM_USE_RESPONSE = function (msg) {
 			text: "Failed to use item.",
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "red"
+			color: "Red",
+			outline: "White",
 		});
 	} else {
 		if (amount)
@@ -158,7 +161,8 @@ tmw.handler.SMSG_PLAYER_EQUIP = function (msg) {
 			text: "Unable to equip.",
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "red"
+			color: "Red",
+			outline: "White",
 		});
 		return;
 	}
@@ -177,7 +181,8 @@ tmw.handler.SMSG_PLAYER_UNEQUIP = function (msg) {
 			text: "Unable to unequip.",
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
-			color: "red"
+			color: "Red",
+			outline: "White",
 		});
 		return;
 	}

@@ -184,18 +184,23 @@ function createLoop() {
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
 			var text = null;
+			var color = null;
+			var outline = null;
 			switch (being.type) {
 				case "PLAYER":
-					context.fillStyle = being.gmStatus ? "red" : "white";
+					color = being.gmStatus ? "Red" : "White";
+					outline = "Black";
 					text = being.nameInsecure;
 					break;
 				case "NPC":
-					context.fillStyle = "blue";
+					color = "Blue";
+					outline = "White";
 					text = being.name;
 					break;
 				case "MONSTER":
 					if (being.isSelected) {
-						context.fillStyle = "black";
+						color = "Black";
+						outline = "White";
 						text = tmw.monsterDB[being.job].name;
 						if (being.damageTaken)
 							text += ", " + being.damageTaken;
@@ -203,13 +208,13 @@ function createLoop() {
 					break;
 				default: console.error("Being type not handled: " + being.type);
 			}
-			if (text) context.fillText(text, being.x-scrollX, being.y+26-scrollY);
+			if (text)
+				drawText(text, being.x-scrollX, being.y+26-scrollY, color, outline);
 			if (being.emoteImage) drawEmote(being, scrollX, scrollY);
 			if (being.speechText) drawSpeech(being, scrollX, scrollY);
 		}
-		context.fillStyle = "LightSkyBlue";
-		context.fillText(tmw.localplayer.name, tmw.localplayer.x - scrollX,
-			tmw.localplayer.y + 26 - scrollY);
+		drawText(tmw.localplayer.name, tmw.localplayer.x - scrollX,
+			tmw.localplayer.y + 26 - scrollY, "LightSkyBlue", "Black");
 		if (tmw.localplayer.emoteImage) drawEmote(tmw.localplayer, scrollX, scrollY);
 		if (tmw.localplayer.speechText) drawSpeech(tmw.localplayer, scrollX, scrollY);
 
@@ -305,6 +310,18 @@ function createLoop() {
 		tmw.context.fillText(being.speechText, left, top);
 	}
 
+	function drawText(text, x, y, color, outline) {
+		if (outline) {
+			tmw.context.fillStyle = outline;
+			tmw.context.fillText(text, x-1, y);
+			tmw.context.fillText(text, x+1, y);
+			tmw.context.fillText(text, x, y-1);
+			tmw.context.fillText(text, x, y+1);
+		}
+		tmw.context.fillStyle = color;
+		tmw.context.fillText(text, x, y);
+	}
+
 	function drawParticleText(scrollX, scrollY) {
 		for (var i in tmw.textParticle) {
 			if (tmw.textParticle[i].timeout < tmw.timeAnimation)
@@ -317,6 +334,13 @@ function createLoop() {
 			if (!p.being) return;
 			var left = p.being.x - scrollX;
 			var top = p.being.y - scrollY - 76 + (p.timeout - tmw.timeAnimation) / 100;
+			if (p.outline) {
+				tmw.context.fillStyle = p.outline;
+				tmw.context.fillText(p.text, left-1, top);
+				tmw.context.fillText(p.text, left+1, top);
+				tmw.context.fillText(p.text, left, top-1);
+				tmw.context.fillText(p.text, left, top+1);
+			}
 			tmw.context.fillStyle = p.color;
 			tmw.context.fillText(p.text, left, top);
 		}

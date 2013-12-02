@@ -108,7 +108,7 @@ function createStatusWindow() {
 	var win = $("<div>")
 		.attr("id", "statusWindow")
 		.css("position", "absolute")
-		.css("width", 400)
+		.css("width", 420)
 		.css("left", 30)
 		.css("top", 28)
 		.hide()
@@ -125,7 +125,7 @@ function createStatusWindow() {
 		.css("background", "Sienna");
 	document.getElementById("statusClose").onclick = tmw.gui.status.toggle;
 	$("#statusWindowLeft")
-		.css("width", "60%")
+		.css("width", "55%")
 		.css("float", "left")
 		.html("<table>" +
 			"<tr>" +
@@ -169,7 +169,7 @@ function createStatusWindow() {
 			"<br><button id='statusWindowCopyToChatButton'>Copy to chat</button>"
 		);
 	$("#statusWindowRight")
-		.css("width", "40%")
+		.css("width", "45%")
 		.css("float", "right")
 		.html(
 			"<div style='color:blue'>Level: <span id='statusWindowValueLevel'>" + a.level + "</span></div>" +

@@ -322,20 +322,26 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 		case 0x0: // HIT
 		case 0xa: // CRITICAL
 		case 0x8: // MULTI
-			var color;
-			if (!damage)
+			var color, outline;
+			if (!damage) {
 				color = "Yellow";
-			else if (dstId === tmw.localplayer.id)
+				outline = "Black";
+			} else if (dstId === tmw.localplayer.id) {
 				color = "Red";
-			else if (srcId === tmw.localplayer.id)
+				outline = "White";
+			} else if (srcId === tmw.localplayer.id) {
 				color = "Green";
-			else
+				outline = "White";
+			} else {
 				color = "Blue";
+				outline = "White";
+			}
 			tmw.textParticle.push({
 				text: (damage ? damage.toString() : "miss"),
 				timeout: tmw.timeAnimation + 3000,
 				being: dstBeing,
-				color: color
+				color: color,
+				outline: outline,
 			});
 			if (srcBeing && !srcBeing.movePixelPath.length &&
 				srcBeing.action.indexOf("attack") !== 0) {
@@ -350,7 +356,8 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 				text: ("REFLECT " + damage),
 				timeout: tmw.timeAnimation + 3000,
 				being: dstBeing,
-				color: "#dddd00"
+				color: "#dddd00",
+				outline: "Black",
 			});
 			break;
 		case 0xb: // FLEE (Lucky Dodge)
@@ -358,7 +365,8 @@ tmw.handler.SMSG_BEING_ACTION = function (msg) {
 				text: "miss",
 				timeout: tmw.timeAnimation + 3000,
 				being: dstBeing,
-				color: "#dddd00"
+				color: "#dddd00",
+				outline: "Black",
 			});
 			break;
 		default: console.error("Unknown SMSG_BEING_ACTION type " + type);
