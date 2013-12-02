@@ -20,8 +20,91 @@
 "use strict";
 
 function createStatusWindow() {
+	tmw.gui.status = {
+		toggle: function () {
+			win.toggle();
+		},
+		draw: function () {
+			for (var i in this) {
+				if (i !== "toggle" && i !== "draw")
+					this[i]();
+			}
+		},
+		strUpdate: function () {
+			$("#statusWindowValueStr").text(s.strBase + (s.strBonus ? " + " + s.strBonus : ""));
+			$("#statusWindowValueStrPointsNeeded").text(s.strPointsNeeded);
+		},
+		agiUpdate: function () {
+			$("#statusWindowValueAgi").text(s.agiBase + (s.agiBonus ? " + " + s.agiBonus : ""));
+			$("#statusWindowValueAgiPointsNeeded").text(s.agiPointsNeeded);
+		},
+		vitUpdate: function () {
+			$("#statusWindowValueVit").text(s.vitBase + (s.vitBonus ? " + " + s.vitBonus : ""));
+			$("#statusWindowValueVitPointsNeeded").text(s.vitPointsNeeded);
+		},
+		intUpdate: function () {
+			$("#statusWindowValueInt").text(s.intBase + (s.intBonus ? " + " + s.intBonus : ""));
+			$("#statusWindowValueIntPointsNeeded").text(s.intPointsNeeded);
+		},
+		dexUpdate: function () {
+			$("#statusWindowValueDex").text(s.dexBase + (s.dexBonus ? " + " + s.dexBonus : ""));
+			$("#statusWindowValueDexPointsNeeded").text(s.dexPointsNeeded);
+		},
+		lukUpdate: function () {
+			$("#statusWindowValueLuk").text(s.lukBase + (s.lukBonus ? " + " + s.lukBonus : ""));
+			$("#statusWindowValueLukPointsNeeded").text(s.lukPointsNeeded);
+		},
+		updateCharPoints: function () {
+			$("#statusWindowValueCharPoints").text(a.charPoints);
+		},
+		updateLevel: function () {
+			$("#statusWindowValueLevel").text(a.level +
+				(tmw.localplayer.gmLevel ? (" (GM " + tmw.localplayer.gmLevel + ")") : ""));
+		},
+		updateMoney: function () {
+			$("#statusWindowValueMoney").text(a.money);
+		},
+		updateDef: function () {
+			$("#statusWindowValueDef").text(a.defBase +
+				(a.defBonus ? (" + " + a.defBonus) : ""));
+		},
+		updateAtk: function () {
+			$("#statusWindowValueAtk").text(a.atkBase +
+				(a.atkBonus ? (" + " + a.atkBonus) : ""));
+		},
+		updateAttackSpeed: function () {
+			$("#statusWindowValueAttackSpeed").text(tmw.localplayer.attackSpeed);
+		},
+		updateAttackRange: function () {
+			$("#statusWindowValueAttackRange").text(tmw.localplayer.attackRange);
+		},
+		updateAccuracy: function () {
+			$("#statusWindowValueAccuracy").text(a.accuracy);
+		},
+		updateEvade: function () {
+			$("#statusWindowValueEvade").text(a.evadeBase +
+				(a.evadeBonus ? (" + " + a.evadeBonus) : ""));
+		},
+		updateCritical: function () {
+			$("#statusWindowValueCritical").text(a.critical);
+		},
+		updateMAtk: function () {
+			$("#statusWindowValueMAtk").text(a.matkBase +
+				(a.matkBonus ? (" + " + a.matkBonus) : ""));
+			tmw.gui.gui.updateMp();
+		},
+		updateMDef: function () {
+			$("#statusWindowValueMDef").text(a.mdefBase +
+				(a.mdefBonus ? (" + " + a.mdefBonus) : ""));
+		},
+		updateMoveSpeed: function (value) {
+			$("#statusWindowValueMoveSpeed").text(value);
+		},
+	};
+
 	var a = tmw.localplayer.attributes;
 	var s = tmw.localplayer.states;
+
 	var win = $("<div>")
 		.attr("id", "statusWindow")
 		.css("position", "absolute")
@@ -31,13 +114,16 @@ function createStatusWindow() {
 		.hide()
 		.css("background", "Bisque")
 		.html("<div id='statusWindowTitle'>" +
-			"<span style='margin-left:4px;'>Status</span></div>" +
+			"<span style='margin-left:4px;'>Status</span><span " +
+			"id='statusClose' class='ui-icon ui-icon-close' style='float:right'>" +
+			"</span></div>" +
 			"<div id='statusWindowLeft'></div>" +
 			"<div id='statusWindowRight'></div>")
 		.appendTo("#game");
 	win.draggable({handle: "#statusWindowTitle", containment: "#game"});
 	$("#statusWindowTitle")
 		.css("background", "Sienna");
+	document.getElementById("statusClose").onclick = tmw.gui.status.toggle;
 	$("#statusWindowLeft")
 		.css("width", "60%")
 		.css("float", "left")
@@ -123,86 +209,4 @@ function createStatusWindow() {
 			" luk:" + s.lukBase + (s.lukBonus ? "+" + s.lukBonus : "")
 		);
 	});
-
-	tmw.gui.status = {
-		toggle: function () {
-			win.toggle();
-		},
-		draw: function () {
-			for (var i in this) {
-				if (i !== "toggle" && i !== "draw")
-					this[i]();
-			}
-		},
-		strUpdate: function () {
-			$("#statusWindowValueStr").text(s.strBase + (s.strBonus ? " + " + s.strBonus : ""));
-			$("#statusWindowValueStrPointsNeeded").text(s.strPointsNeeded);
-		},
-		agiUpdate: function () {
-			$("#statusWindowValueAgi").text(s.agiBase + (s.agiBonus ? " + " + s.agiBonus : ""));
-			$("#statusWindowValueAgiPointsNeeded").text(s.agiPointsNeeded);
-		},
-		vitUpdate: function () {
-			$("#statusWindowValueVit").text(s.vitBase + (s.vitBonus ? " + " + s.vitBonus : ""));
-			$("#statusWindowValueVitPointsNeeded").text(s.vitPointsNeeded);
-		},
-		intUpdate: function () {
-			$("#statusWindowValueInt").text(s.intBase + (s.intBonus ? " + " + s.intBonus : ""));
-			$("#statusWindowValueIntPointsNeeded").text(s.intPointsNeeded);
-		},
-		dexUpdate: function () {
-			$("#statusWindowValueDex").text(s.dexBase + (s.dexBonus ? " + " + s.dexBonus : ""));
-			$("#statusWindowValueDexPointsNeeded").text(s.dexPointsNeeded);
-		},
-		lukUpdate: function () {
-			$("#statusWindowValueLuk").text(s.lukBase + (s.lukBonus ? " + " + s.lukBonus : ""));
-			$("#statusWindowValueLukPointsNeeded").text(s.lukPointsNeeded);
-		},
-		updateCharPoints: function () {
-			$("#statusWindowValueCharPoints").text(a.charPoints);
-		},
-		updateLevel: function () {
-			$("#statusWindowValueLevel").text(a.level +
-				(tmw.localplayer.gmLevel ? (" (GM " + tmw.localplayer.gmLevel + ")") : ""));
-		},
-		updateMoney: function () {
-			$("#statusWindowValueMoney").text(a.money);
-		},
-		updateDef: function () {
-			$("#statusWindowValueDef").text(a.defBase +
-				(a.defBonus ? (" + " + a.defBonus) : ""));
-		},
-		updateAtk: function () {
-			$("#statusWindowValueAtk").text(a.atkBase +
-				(a.atkBonus ? (" + " + a.atkBonus) : ""));
-		},
-		updateAttackSpeed: function () {
-			$("#statusWindowValueAttackSpeed").text(tmw.localplayer.attackSpeed);
-		},
-		updateAttackRange: function () {
-			$("#statusWindowValueAttackRange").text(tmw.localplayer.attackRange);
-		},
-		updateAccuracy: function () {
-			$("#statusWindowValueAccuracy").text(a.accuracy);
-		},
-		updateEvade: function () {
-			$("#statusWindowValueEvade").text(a.evadeBase +
-				(a.evadeBonus ? (" + " + a.evadeBonus) : ""));
-		},
-		updateCritical: function () {
-			$("#statusWindowValueCritical").text(a.critical);
-		},
-		updateMAtk: function () {
-			$("#statusWindowValueMAtk").text(a.matkBase +
-				(a.matkBonus ? (" + " + a.matkBonus) : ""));
-			tmw.gui.gui.updateMp();
-		},
-		updateMDef: function () {
-			$("#statusWindowValueMDef").text(a.mdefBase +
-				(a.mdefBonus ? (" + " + a.mdefBonus) : ""));
-		},
-		updateMoveSpeed: function (value) {
-			$("#statusWindowValueMoveSpeed").text(value);
-		},
-	};
 }

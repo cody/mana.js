@@ -41,15 +41,18 @@ function createSkillsWindow() {
 		.css("background", "Bisque")
 		.html("<div id='skillsWindowTitle' style='background:SpringGreen'>" +
 			"<span id='skillsWindowName' style='margin:4px;'>" +
-			"Skills</span></div>" +
+			"Skills</span><span " +
+			"id='skillsClose' class='ui-icon ui-icon-close' style='float:right'>" +
+			"</span></div>" +
 			"<div>" +
 			"<button id='skillsBasicRadio'>Basic</button>" +
 			"<button id='skillsFocusRadio'>Focus</button>" +
 			"<button id='skillsMagicRadio'>Magic</button>" +
 			"</div>" +
-			"<div id='skillsContent'></span></div>")
+			"<div id='skillsContent'></div>")
 		.appendTo("#game");
 	win.draggable({handle: "#skillsWindowTitle", containment: "#game"});
+	document.getElementById("skillsClose").onclick = toggle;
 
 	var content = $("#skillsContent");
 

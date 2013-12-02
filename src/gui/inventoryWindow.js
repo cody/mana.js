@@ -39,8 +39,10 @@ function createInventoryWindow() {
 		.css("right", 0)
 		.css("top", 24)
 		.css("background", "grey")
-		.html("<div id='inventoryWindowHandle'></div>" +
-			"<span style='margin-left:4px;;'>Inventory</span>" +
+		.html("<div id='inventoryWindowHandle'>" +
+			"<span style='margin-left:4px;;'>Inventory</span><span " +
+			"id='inventoryClose' class='ui-icon ui-icon-close' style='float:right'>" +
+			"</span></div>" +
 			"<div id='weightBar'></div>" +
 			"<div id='slotBar'></div>" +
 			"<div id='inventoryWindowScroll'>" +
@@ -53,10 +55,7 @@ function createInventoryWindow() {
 		minWidth: 265, minHeight: 150});
 	win.draggable({handle: "#inventoryWindowHandle",
 		containment: "#game"});
-	$("#inventoryWindowHandle")
-		.css("position", "absolute")
-		.css("width", "100%")
-		.css("height", 42);
+	document.getElementById("inventoryClose").onclick = toggle;
 	$("#weightBar")
 		.css("position", "absolute")
 		.css("left", 3)

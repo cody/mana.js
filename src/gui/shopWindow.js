@@ -47,13 +47,13 @@ function createShopWindow() {
 		.css("top", 26)
 		.hide()
 		.css("background", "Bisque")
-		.html("<div id='shopWindowTitle'>" +
-			"<span id='shopWindowName' style='margin:4px;'>" +
+		.html("<div id='shopWindowTitle' style='background:SpringGreen'>" +
+			"<span id='shopWindowName' style='margin:4px;'></span><span " +
+			"id='shopClose' class='ui-icon ui-icon-close' style='float:right'>" +
 			"</span></div>" +
 			"<div>" +
 			"<button id='shopBuyRadio'>Buy</button>" +
 			"<button id='shopSellRadio'>Sell</button>" +
-			"<button id='shopCloseButton'>Close</button>" +
 			"</div>" +
 			"<div id='shopContent'>Loading...</div>" +
 			"<div id='shopControls'>" +
@@ -72,8 +72,7 @@ function createShopWindow() {
 	win.resizable({resize: resize, containment: "#game",
 		minWidth: 200, minHeight: 150});
 	win.draggable({handle: "#shopWindowTitle", containment: "#game"});
-	$("#shopWindowTitle")
-		.css("background", "SpringGreen");
+	document.getElementById("shopClose").onclick = function () { close(); };
 	$("#shopBuyRadio").click(function () {
 		if (isOpen === "buy") return;
 		isOpen = "buy";
@@ -101,9 +100,6 @@ function createShopWindow() {
 		msg.write8(1); // Sell
 		msg.send();
 	});
-	$("#shopCloseButton")
-		.css("float", "right")
-		.click(function () { close(); });
 	var content = $("#shopContent")
 		.css("background", "White")
 		.css("overflow-y", "scroll");
