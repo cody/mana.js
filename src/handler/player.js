@@ -30,7 +30,7 @@ tmw.handler.SMSG_PLAYER_ARROW_MESSAGE = function (msg) {
     var type = msg.read16();
 	if (type === 0) {
 		tmw.textParticle.push({
-			text: "Equip arrows first.",
+			text: "Equip ammo first",
 			timeout: tmw.timeAnimation + 4000,
 			being: tmw.localplayer,
 			color: "Red",

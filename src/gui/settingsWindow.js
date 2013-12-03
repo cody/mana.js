@@ -101,9 +101,9 @@ function createSettingsWindow() {
 			"<tr><td>Arrows</td><td>Move</td></tr>" +
 			"<tr><td>x</td><td>Attack</td></tr>" +
 			"<tr><td>y or z</td><td>Pick-up item</td></tr>" +
-			"<tr><td>a</td><td>Select Monster</td></tr>" +
+			"<tr><td>a</td><td>Select monster</td></tr>" +
 			"<tr><td>n</td><td>Select NPC</td></tr>" +
-			"<tr><td>q</td><td>Select Player</td></tr>" +
+			"<tr><td>q</td><td>Select player</td></tr>" +
 			"<tr><td>ctrl</td><td>Deselect</td></tr>" +
 			"<tr><td>t</td><td>Talk to selected NPC or open wisper tab for selected player</td></tr>" +
 			"<tr><td>s</td><td>Sit</td></tr>" +
