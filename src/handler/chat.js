@@ -25,6 +25,8 @@ tmw.handler.SMSG_BEING_CHAT = function (msg) {
 	var name = being ? being.name : "";
 	if (!name) name = "???";
 	var text = msg.readString();
+	if (text.indexOf(name + " : ") === 0)
+		text = text.slice(name.length + 3);
 	text = tmw.gui.chat.parse(text);
 	tmw.gui.chat.log(name, text, "being");
 	if (!being) return;
@@ -52,11 +54,11 @@ tmw.handler.SMSG_PLAYER_CHAT = function (msg) {
 
 tmw.handler.SMSG_GM_CHAT = function (msg) {
 	var text = msg.readString();
-	var index = text.indexOf(": ");
+	var index = text.indexOf(" : ");
 	var name = "";
 	if (index !== -1) {
-		name = text.slice(0, index).trim();
-		text = text.slice(index + 2);
+		name = text.slice(0, index);
+		text = text.slice(index + 3);
 	}
 	text = tmw.gui.chat.parse(text);
 	tmw.gui.chat.log(name, text, "gm");
