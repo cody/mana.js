@@ -183,40 +183,35 @@ function createLoop() {
 
 		for (var i in tmw.beings) {
 			var being = tmw.beings[i];
-			var text = null;
-			var color = null;
-			var outline = null;
+			var name = null;
+			var color, outline;
 			switch (being.type) {
 				case "PLAYER":
 					color = being.gmStatus ? "Red" : "White";
 					outline = "Black";
-					text = being.nameInsecure;
+					name = being.nameInsecure;
 					break;
 				case "NPC":
 					color = "Blue";
 					outline = "White";
-					text = being.name;
+					name = being.nameInsecure;
 					break;
 				case "MONSTER":
 					if (being.isSelected) {
 						color = "Black";
 						outline = "White";
-						text = tmw.monsterDB[being.job].name;
+						name = tmw.monsterDB[being.job].name;
 						if (being.damageTaken)
-							text += ", " + being.damageTaken;
+							name += ", " + being.damageTaken;
 					}
 					break;
 				default: console.error("Being type not handled: " + being.type);
 			}
-			if (text)
-				drawText(text, being.x-scrollX, being.y+26-scrollY, color, outline);
-			if (being.emoteImage) drawEmote(being, scrollX, scrollY);
-			if (being.speechText) drawSpeech(being, scrollX, scrollY);
+			if (name)
+				drawName(name, being.x-scrollX, being.y+26-scrollY, color, outline);
 		}
-		drawText(tmw.localplayer.name, tmw.localplayer.x - scrollX,
+		drawName(tmw.localplayer.name, tmw.localplayer.x - scrollX,
 			tmw.localplayer.y + 26 - scrollY, "LightSkyBlue", "Black");
-		if (tmw.localplayer.emoteImage) drawEmote(tmw.localplayer, scrollX, scrollY);
-		if (tmw.localplayer.speechText) drawSpeech(tmw.localplayer, scrollX, scrollY);
 
 		for (var i in tmw.floorItems) {
 			var floor = tmw.floorItems[i]
@@ -225,8 +220,21 @@ function createLoop() {
 			top = floor.y - scrollY;
 			context.drawImage(item.image, left, top);
 		}
-
+		for (var i in tmw.beings) {
+			being = tmw.beings[i];
+			if (being.emoteImage)
+				drawEmote(being, scrollX, scrollY);
+		}
+		if (tmw.localplayer.emoteImage)
+			drawEmote(tmw.localplayer, scrollX, scrollY);
 		drawParticleText(scrollX, scrollY);
+		for (var i in tmw.beings) {
+			being = tmw.beings[i];
+			if (being.speechText)
+				drawSpeech(being, scrollX, scrollY);
+		}
+		if (tmw.localplayer.speechText)
+			drawSpeech(tmw.localplayer, scrollX, scrollY);
 	}
 
 	function move(being, pixelsMoved) {
@@ -306,18 +314,27 @@ function createLoop() {
 		}
 		var left = being.x - scrollX;
 		var top = being.y - 46 - scrollY;
+		var halfWidth = 6 +
+			Math.floor(tmw.context.measureText(being.speechText).width / 2);
+		tmw.context.fillStyle = "rgba(0, 0, 0, 0.6)";
+		tmw.context.beginPath();
+		tmw.context.moveTo(left, top - 17);
+		tmw.context.arcTo(left + halfWidth, top - 17, left + halfWidth, top + 3, 5);
+		tmw.context.arcTo(left + halfWidth, top + 3, left - halfWidth, top + 3, 5);
+		tmw.context.arcTo(left - halfWidth, top + 3, left - halfWidth, top - 17, 5);
+		tmw.context.arcTo(left - halfWidth, top - 17, left + halfWidth, top - 17, 5);
+		tmw.context.closePath();
+		tmw.context.fill();
 		tmw.context.fillStyle = "white";
 		tmw.context.fillText(being.speechText, left, top);
 	}
 
-	function drawText(text, x, y, color, outline) {
-		if (outline) {
-			tmw.context.fillStyle = outline;
-			tmw.context.fillText(text, x-1, y);
-			tmw.context.fillText(text, x+1, y);
-			tmw.context.fillText(text, x, y-1);
-			tmw.context.fillText(text, x, y+1);
-		}
+	function drawName(text, x, y, color, outline) {
+		tmw.context.fillStyle = outline;
+		tmw.context.fillText(text, x-1, y);
+		tmw.context.fillText(text, x+1, y);
+		tmw.context.fillText(text, x, y-1);
+		tmw.context.fillText(text, x, y+1);
 		tmw.context.fillStyle = color;
 		tmw.context.fillText(text, x, y);
 	}
@@ -333,14 +350,13 @@ function createLoop() {
 			var p = tmw.textParticle[i];
 			if (!p.being) return;
 			var left = p.being.x - scrollX;
-			var top = p.being.y - scrollY - 76 + (p.timeout - tmw.timeAnimation) / 100;
-			if (p.outline) {
-				tmw.context.fillStyle = p.outline;
-				tmw.context.fillText(p.text, left-1, top);
-				tmw.context.fillText(p.text, left+1, top);
-				tmw.context.fillText(p.text, left, top-1);
-				tmw.context.fillText(p.text, left, top+1);
-			}
+			var top = p.being.y - scrollY - 76 +
+				Math.round((p.timeout - tmw.timeAnimation) / 100);
+			tmw.context.fillStyle = p.outline;
+			tmw.context.fillText(p.text, left-1, top);
+			tmw.context.fillText(p.text, left+1, top);
+			tmw.context.fillText(p.text, left, top-1);
+			tmw.context.fillText(p.text, left, top+1);
 			tmw.context.fillStyle = p.color;
 			tmw.context.fillText(p.text, left, top);
 		}
