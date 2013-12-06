@@ -24,6 +24,8 @@ function createLoop() {
 	var checkFps = 0;
 	var countFps = 0;
 	var game;
+	var scrollX;
+	var scrollY;
 
 	tmw.loop = {
 		start: function () {
@@ -122,8 +124,8 @@ function createLoop() {
 
 		var context = tmw.context;
 		context.clearRect(0, 0, game.width(), game.height());
-		var scrollX = tmw.localplayer.x - Math.floor(game.width() / 2);
-		var scrollY = tmw.localplayer.y - Math.floor(game.height() / 2);
+		scrollX = tmw.localplayer.x - Math.floor(game.width() / 2);
+		scrollY = tmw.localplayer.y - Math.floor(game.height() / 2);
 		var startX = Math.max(0, Math.floor(scrollX / 32));
 		var startY = Math.max(0, Math.floor(scrollY / 32));
 		var endX = Math.min(tmw.map.width, Math.ceil((game.width() + scrollX) / 32));
@@ -182,37 +184,9 @@ function createLoop() {
 		context.textBaseline = "bottom";
 
 		for (var i in tmw.beings) {
-			var being = tmw.beings[i];
-			var name = null;
-			var color, outline;
-			switch (being.type) {
-				case "PLAYER":
-					color = being.gmStatus ? "Red" : "White";
-					outline = "Black";
-					name = being.nameInsecure;
-					break;
-				case "NPC":
-					color = "Blue";
-					outline = "White";
-					name = being.nameInsecure;
-					break;
-				case "MONSTER":
-					if (being.isSelected) {
-						color = "Black";
-						outline = "White";
-						name = tmw.monsterDB[being.job].name;
-						if (being.damageTaken)
-							name += ", " + being.damageTaken;
-					}
-					break;
-				default: console.error("Being type not handled: " + being.type);
-			}
-			if (name)
-				drawName(name, being.x-scrollX, being.y+26-scrollY, color, outline);
+			drawName(tmw.beings[i]);
 		}
-		drawName(tmw.localplayer.name, tmw.localplayer.x - scrollX,
-			tmw.localplayer.y + 26 - scrollY, "LightSkyBlue", "Black");
-
+		drawName(tmw.localplayer);
 		for (var i in tmw.floorItems) {
 			var floor = tmw.floorItems[i]
 			var item = tmw.itemDB[floor.itemId];
@@ -223,18 +197,18 @@ function createLoop() {
 		for (var i in tmw.beings) {
 			being = tmw.beings[i];
 			if (being.emoteImage)
-				drawEmote(being, scrollX, scrollY);
+				drawEmote(being);
 		}
 		if (tmw.localplayer.emoteImage)
-			drawEmote(tmw.localplayer, scrollX, scrollY);
-		drawParticleText(scrollX, scrollY);
+			drawEmote(tmw.localplayer);
+		drawParticleText();
 		for (var i in tmw.beings) {
 			being = tmw.beings[i];
 			if (being.speechText)
-				drawSpeech(being, scrollX, scrollY);
+				drawSpeech(being);
 		}
 		if (tmw.localplayer.speechText)
-			drawSpeech(tmw.localplayer, scrollX, scrollY);
+			drawSpeech(tmw.localplayer);
 	}
 
 	function move(being, pixelsMoved) {
@@ -296,7 +270,7 @@ function createLoop() {
 		being.yTile = Math.floor(being.y / 32);
 	}
 
-	function drawEmote(being, scrollX, scrollY) {
+	function drawEmote(being) {
 		if (tmw.timeAnimation > being.emoteTimeout) {
 			being.emoteImage = null;
 			being.emoteTimeout = null;
@@ -307,7 +281,7 @@ function createLoop() {
 		tmw.context.drawImage(being.emoteImage, left, top);
 	}
 
-	function drawSpeech(being, scrollX, scrollY) {
+	function drawSpeech(being) {
 		if (tmw.timeAnimation > being.speechTimeout) {
 			being.speechText = null;
 			return;
@@ -329,17 +303,28 @@ function createLoop() {
 		tmw.context.fillText(being.speechText, left, top);
 	}
 
-	function drawName(text, x, y, color, outline) {
-		tmw.context.fillStyle = outline;
-		tmw.context.fillText(text, x-1, y);
-		tmw.context.fillText(text, x+1, y);
-		tmw.context.fillText(text, x, y-1);
-		tmw.context.fillText(text, x, y+1);
-		tmw.context.fillStyle = color;
-		tmw.context.fillText(text, x, y);
+	function drawName(being) {
+		var name = null;
+		if (being.isSelected && being.type === "MONSTER") {
+			name = tmw.monsterDB[being.job].name;
+			if (being.damageTaken)
+				name += ", " + being.damageTaken;
+		} else {
+			name = being.nameInsecure;
+		}
+		if (!name) return;
+		var x = being.x - scrollX;
+		var y = being.y - scrollY + 26;
+		tmw.context.fillStyle = being.nameOutline;
+		tmw.context.fillText(name, x-1, y);
+		tmw.context.fillText(name, x+1, y);
+		tmw.context.fillText(name, x, y-1);
+		tmw.context.fillText(name, x, y+1);
+		tmw.context.fillStyle = being.nameColor;
+		tmw.context.fillText(name, x, y);
 	}
 
-	function drawParticleText(scrollX, scrollY) {
+	function drawParticleText() {
 		for (var i in tmw.textParticle) {
 			if (tmw.textParticle[i].timeout < tmw.timeAnimation)
 				tmw.textParticle.shift();

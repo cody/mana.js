@@ -58,6 +58,8 @@ function readCharacterData(msg) {
 	setEquipment(c, "misc2", msg.read16());
 	c.nameInsecure = msg.readString(24);
 	c.name = htmlToText(c.nameInsecure);
+	c.nameColor = "LightSkyBlue";
+	c.nameOutline = "Black";
 	c.states.strBase = msg.read8();
 	c.states.agiBase = msg.read8();
 	c.states.vitBase = msg.read8();

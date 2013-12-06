@@ -30,6 +30,8 @@ function createBeing(being) {
 		being.type = "PLAYER";
 	} else if (job >= 46 && job <= 1000) {
 		being.type = "NPC";
+		being.nameColor = "Blue";
+		being.nameOutline = "White";
 		var npc = tmw.npcDB[job];
 		if (npc.frames === undefined) {
 			npc.frames = null;
@@ -46,6 +48,8 @@ function createBeing(being) {
 		being.template = npc;
 	} else if (job > 1000 && job <= 2000) {
 		being.type = "MONSTER";
+		being.nameColor = "Black";
+		being.nameOutline = "White";
 		var monster = tmw.monsterDB[being.job];
 		if (monster.frames === undefined) {
 			monster.frames = null;
@@ -125,6 +129,8 @@ function processPlayerPacket(msg, msgType) {
 		being.sprite = null;
 	}
 	being.gmStatus = msg.read16() ? true : false;
+	being.nameColor = being.gmStatus ?  "Red" : "White";
+	being.nameOutline = "Black";
 	if (msgType === "SMSG_PLAYER_UPDATE_1")	{
 		var action = msg.read8();
 		switch (action) {
