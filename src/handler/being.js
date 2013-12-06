@@ -43,8 +43,11 @@ function createBeing(being) {
 				xhr.variant = npc.sprites[0].variant;
 			}
 		}
-		for (var i=1; i<npc.sprites.length; i++)
-			setAccessories(being, npc.sprites[i].path);
+		for (var i=1; i<npc.sprites.length; i++) {
+			var variant = npc.sprites[i].variant === undefined ?
+				"" : "[" + npc.sprites[i].variant + "]";
+			setAccessories(being, npc.sprites[i].path + variant);
+		}
 		being.template = npc;
 	} else if (job > 1000 && job <= 2000) {
 		being.type = "MONSTER";

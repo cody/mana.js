@@ -306,8 +306,12 @@ function setAccessories(being, key) {
 	if (!sprite) {
 		sprite = {key: key, frames: null};
 		tmw.sprites[key] = sprite;
-		var pathAndColor = key.split("|");
+		var pathColorAndVariant = key.split("[");
+		var pathAndColor = pathColorAndVariant[0].split("|");
 		var xhr = loadXml("graphics/sprites/" + pathAndColor[0], loadFrames);
+		if (pathColorAndVariant.length === 2)
+			xhr.variant = parseInt(pathColorAndVariant[1]);
+		console.assert(xhr.variant !== NaN);
 		if (pathAndColor.length === 2)
 			xhr.color = [pathAndColor[1]];
 		xhr.actor = sprite;
