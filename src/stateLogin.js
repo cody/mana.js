@@ -60,8 +60,8 @@ function stateLogin() {
 		"<div id='signUp' style='float:right; font-weight:bold;" +
 		"font-family:monospace;'></div><br>" +
 		"<label for='formName'>Name</label>" +
-		"<input type='text' id='formName' class='ui-widget-content ui-corner-all'>" +
-		"<label for='formPassword'>Password</label>" +
+		"<input type='text' id='formName' class='ui-widget-content ui-corner-all'" +
+		"spellcheck='false'><label for='formPassword'>Password</label>" +
 		"<input type='password' id='formPassword' class='ui-widget-content ui-corner-all'>" +
 		"<button id='connectButton'>Play</button>" +
 		"</form>" +
@@ -229,9 +229,9 @@ function stateLogin() {
 				"<table>" +
 				"<tr><td>Hostname:</td><td id='hostname' style='font-size:10pt'></td>" +
 				"<tr><td>Port:</td><td id='port' style='font-size:10pt'></td>" +
-				"<tr><td>Name:</td><td><input id='account'></td>" +
+				"<tr><td>Name:</td><td><input id='account' spellcheck='false'></td>" +
 				"<tr><td>Password:</td><td><input type='password' id='password'></td>" +
-				"<tr><td>Character:</td><td><input id='character'></td>" +
+				"<tr><td>Character:</td><td><input id='character' spellcheck='false'></td>" +
 				"<tr><td>Client data:</td><td style='font-size:10pt'>" +
 				"<form id='radioClientData'>" +
 				"<label><input type='radio' id='clientDataDefault' name='updates'>Default</input></label>" +
@@ -344,7 +344,7 @@ function stateLogin() {
 		div.innerHTML = "<div style='background:DeepSkyBlue'>" +
 			"<span style='margin:4px;'>Register at " +
 			serverList[serverListIndex].name + "</span></div>" +
-			"<table><tr><td>Name:</td><td><input id='name'></td></tr>" +
+			"<table><tr><td>Name:</td><td><input id='name' spellcheck='false'></td></tr>" +
 			"<tr><td>Password:</td><td><input type='password' id='password'></td></tr>" +
 			"<tr><td>Confirm:</td><td><input type='password' id='confirm'></td></tr>" +
 			"<tr><td></td><td><form><label><input type='radio' id='male' name='sex' checked>Male</input></label>" +

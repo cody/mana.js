@@ -3,7 +3,7 @@
 	"name": "The Mana World",
 	"short_name": "TMW",
 	"description": "A free open source 2d MMORPG",
-	"version": "2013.12.6",
+	"version": "2013.12.7",
 	"minimum_chrome_version": "29",
 	"app": {
 		"background": {
