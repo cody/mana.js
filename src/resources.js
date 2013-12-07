@@ -227,18 +227,15 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 		var equip = being.equipment[slot];
 		if (!equip || !equip.frames)
 			continue;
-		if (!equip.frames[being.action]) {
-			if (equip.frames["stand"])
-				being.action = "stand";
-			else
-				continue;
-		}
-		if (!equip.frames[being.action][being.direction]) {
-			frame = equip.frames[being.action][1][0]
+		var action = equip.frames[being.action] ? being.action : "stand";
+		if (!equip.frames[action])
+			continue;
+		if (!equip.frames[action][being.direction]) {
+			frame = equip.frames[action][1][0]
 		} else {
-			frame = equip.frames[being.action][being.direction][being.spriteIndex];
+			frame = equip.frames[action][being.direction][being.spriteIndex];
 			if (!frame)
-				frame = equip.frames[being.action][being.direction][0];
+				frame = equip.frames[action][being.direction][0];
 		}
 		left = being.x - scrollX - Math.floor(equip.frames.width / 2);
 		top = being.y - scrollY - equip.frames.height + 16;
