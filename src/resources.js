@@ -225,8 +225,14 @@ function drawSprites(being, scrollX, scrollY, timeAnimation) {
 	tmw.context.drawImage(frame.canvas, left + frame.offsetX, top + frame.offsetY);
 	for (var slot in being.equipment) {
 		var equip = being.equipment[slot];
-		if (!equip || !equip.frames || !equip.frames[being.action])
+		if (!equip || !equip.frames)
 			continue;
+		if (!equip.frames[being.action]) {
+			if (equip.frames["stand"])
+				being.action = "stand";
+			else
+				continue;
+		}
 		if (!equip.frames[being.action][being.direction]) {
 			frame = equip.frames[being.action][1][0]
 		} else {
