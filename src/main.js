@@ -62,6 +62,14 @@ function main() {
 		if (tmw.handler[p]) tmw.callHandler[tmw.packets[p]] = tmw.handler[p];
 	}
 
+	chrome.notifications.onClicked.addListener(function () {
+		chrome.notifications.getAll(function (allIds) {
+			chrome.app.window.current().show();
+			for (var i in allIds)
+				chrome.notifications.clear(i, $.noop);
+		})
+	});
+
 	tmw.state.set("STATE_START");
 }
 

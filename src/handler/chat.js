@@ -32,6 +32,7 @@ tmw.handler.SMSG_BEING_CHAT = function (msg) {
 	if (!being) return;
 	being.speechText = text;
 	being.speechTimeout = tmw.timeAnimation + 5000;
+	notifications(name, text, "being");
 }
 
 tmw.handler.SMSG_PLAYER_CHAT = function (msg) {
@@ -68,8 +69,10 @@ tmw.handler.SMSG_WHISPER = function (msg) {
 	var nick = msg.readString(24);
 	var text = msg.readString();
 	text = tmw.gui.chat.parse(text);
-	if (text.indexOf("!selllist ") !== 0 && text.indexOf("!buylist ") !== 0)
+	if (text.indexOf("!selllist ") !== 0 && text.indexOf("!buylist ") !== 0) {
 		tmw.gui.chat.log(nick, text, "wisper");
+		notifications(nick, text, "wisper");
+	}
 };
 
 tmw.handler.SMSG_WHISPER_RESPONSE = function (msg) {
@@ -86,3 +89,26 @@ tmw.handler.SMSG_WHISPER_RESPONSE = function (msg) {
 		console.error("SMSG_WHISPER_RESPONSE: Unknown response type.");
 	}
 };
+
+function notifications(name, text, type) {
+	if (!chrome.app.window.current().isMinimized())
+		return;
+	var lowName = tmw.localplayer.name.toLowerCase();
+	var lowText = text.toLowerCase();
+	if (type === "being" && lowText.indexOf(lowName) === -1)
+		return;
+	try {
+		var options = {
+			type: "basic",
+			title: name + (type === "being" ? " says:" : " wispers:"),
+			message: text,
+			iconUrl: "graphics/icon128.png",
+			isClickable: true
+		}
+		chrome.notifications.create("", options, $.noop);
+	} catch (error) {
+		console.log("Notifications don't work in this version of Chrome: " +
+			error.message);
+		return;
+	}
+}
