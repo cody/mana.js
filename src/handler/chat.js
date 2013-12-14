@@ -27,10 +27,9 @@ tmw.handler.SMSG_BEING_CHAT = function (msg) {
 	var text = msg.readString();
 	if (text.indexOf(name + " : ") === 0)
 		text = text.slice(name.length + 3);
-	text = tmw.gui.chat.parse(text);
 	tmw.gui.chat.log(name, text, "being");
 	if (!being) return;
-	being.speechText = text;
+	being.speechText = tmw.gui.chat.parse(text);
 	being.speechTimeout = tmw.timeAnimation + 5000;
 	notifications(name, text, "being");
 }
@@ -61,14 +60,12 @@ tmw.handler.SMSG_GM_CHAT = function (msg) {
 		name = text.slice(0, index);
 		text = text.slice(index + 3);
 	}
-	text = tmw.gui.chat.parse(text);
 	tmw.gui.chat.log(name, text, "gm");
 };
 
 tmw.handler.SMSG_WHISPER = function (msg) {
 	var nick = msg.readString(24);
 	var text = msg.readString();
-	text = tmw.gui.chat.parse(text);
 	if (text.indexOf("!selllist ") !== 0 && text.indexOf("!buylist ") !== 0) {
 		tmw.gui.chat.log(nick, text, "wisper");
 		notifications(nick, text, "wisper");

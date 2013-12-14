@@ -160,8 +160,9 @@ function createChatWindow() {
 
 	function log(name, text, type) {
 		var color = "";
-		text = name + (name ? ": " : "") + text;
 		text = htmlToText(text);
+		text = parse(text, true);
+		text = name + (name ? ": " : "") + text;
 		var date = new Date();
 		var minutes = (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes();
 		var time = "[" + date.getUTCHours() + ":" + minutes + "] ";
@@ -202,7 +203,14 @@ function createChatWindow() {
 		if (fromBottom < 4) panel.tab.scrollTop(999999);
 	}
 
-	function parse(text) {
-		return text.replace(/##[0-9]/g, "");
+	function parse(text, createLinks) {
+		text = text.replace(/##[0-9]/g, ""); // colors
+		text = text.replace(/\[@@\d+\|(.+?)@@\]/g, "[$1]"); // mana+ item links
+		text = text.replace(/\[@@(https?\:\/\/.+)\s\|.+@@\]/, "$1 "); // mana+ web links
+		if (createLinks) {
+			text = text.replace(/(https?:\/\/\S+)/,
+				"<a href='$1' target='_blank'>$1</a>");
+		}
+		return text;
 	}
 }
