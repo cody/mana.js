@@ -263,6 +263,7 @@ function processBeingPacket(msg, msgType) {
 			being.sprite = null;
 		}
 		being.direction = coord.direction;
+		being.sprite = null;
 	}
 	msg.skip(1);
 	msg.skip(1);
