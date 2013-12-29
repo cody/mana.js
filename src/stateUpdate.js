@@ -167,8 +167,11 @@ function stateUpdate() {
 			);
 		}
 		else {
-			var html = document.getElementById("wallpaper");
-			html.innerHTML += "<b>Fatal Error " + http.status + ": " + http.statusText + "</b><br>";
+			var text = "XMLHttpRequest Error with status " + http.status;
+			if (http.statusText)
+				text += ": " + http.statusText;
+			console.error(text);
+			tmw.net.fatalError(text);
 		}
 	}
 	
